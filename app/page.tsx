@@ -59,7 +59,7 @@ export default function Home() {
   const [selectedDate, setSelectedDate] = useState<string>(todayStr);
 
   // 분할 방식 및 분할별 등록된 종목 (Day1, Day2 ...)
-  const [splitCount, setSplitCount] = useState<number>(3); // 기본 3분할
+  const [splitCount, setSplitCount] = useState<number>(3);
   const [splitRoutines, setSplitRoutines] = useState<Record<string, string[]>>({
     'Day 1 (가슴/삼두)': ['바벨 벤치프레스 (프리)', '케이블 트라이셉스 푸시다운 (바)'],
     'Day 2 (등/이두)': ['랫풀다운 (머신)', '바벨 컬 (프리)'],
@@ -151,7 +151,28 @@ export default function Home() {
 
   return (
     <main className="max-w-md mx-auto p-4 min-h-screen bg-slate-50 text-slate-900 pb-12">
-      <h1 className="text-2xl font-bold mb-4 text-center">🏋️ Gym Tracker</h1>
+      {/* 로고 헤더 */}
+      <div className="flex items-center justify-center gap-2 mb-6 pt-2">
+        <div className="w-9 h-9 rounded-xl bg-blue-600 flex items-center justify-center shadow-md shadow-blue-200">
+          <svg 
+            className="w-5 h-5 text-white" 
+            fill="none" 
+            stroke="currentColor" 
+            strokeWidth="2.5" 
+            viewBox="0 0 24 24" 
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path 
+              strokeLinecap="round" 
+              strokeLinejoin="round" 
+              d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" 
+            />
+          </svg>
+        </div>
+        <span className="text-xl font-extrabold tracking-tight text-slate-900">
+          GYM <span className="text-blue-600">TRACKER</span>
+        </span>
+      </div>
 
       {/* 탭 네비게이션 */}
       <div className="flex bg-slate-200 p-1 rounded-xl mb-4 text-xs font-semibold">
