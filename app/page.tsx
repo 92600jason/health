@@ -2,11 +2,13 @@
 
 import React, { useState } from "react";
 
-// 부위별 운동 데이터 베이스
+// 부위별 운동 데이터 베이스 (스미스 머신 종목 추가)
 const EXERCISE_DATABASE = [
   // 가슴
   { name: "벤치프레스", category: "가슴", isOneArm: false },
+  { name: "스미스 머신 벤치프레스", category: "가슴", isOneArm: false },
   { name: "인클라인 벤치프레스", category: "가슴", isOneArm: false },
+  { name: "스미스 머신 인클라인 프레스", category: "가슴", isOneArm: false },
   { name: "덤벨 프레스", category: "가슴", isOneArm: false },
   { name: "원암 덤벨 프레스", category: "가슴", isOneArm: true },
   { name: "체스트 플라이", category: "가슴", isOneArm: false },
@@ -18,6 +20,7 @@ const EXERCISE_DATABASE = [
   { name: "렛풀다운", category: "등", isOneArm: false },
   { name: "원암 렛풀다운", category: "등", isOneArm: true },
   { name: "바벨로우", category: "등", isOneArm: false },
+  { name: "스미스 머신 바벨로우", category: "등", isOneArm: false },
   { name: "원암 덤벨로우", category: "등", isOneArm: true },
   { name: "시티드 케이블로우", category: "등", isOneArm: false },
   { name: "원암 케이블로우", category: "등", isOneArm: true },
@@ -25,6 +28,7 @@ const EXERCISE_DATABASE = [
 
   // 어깨
   { name: "오버헤드 프레스", category: "어깨", isOneArm: false },
+  { name: "스미스 머신 숄더 프레스", category: "어깨", isOneArm: false },
   { name: "덤벨 숄더 프레스", category: "어깨", isOneArm: false },
   { name: "원암 덤벨 숄더 프레스", category: "어깨", isOneArm: true },
   { name: "사이드 레이터럴 레이즈", category: "어깨", isOneArm: false },
@@ -34,6 +38,8 @@ const EXERCISE_DATABASE = [
 
   // 하체
   { name: "스쿼트", category: "하체", isOneArm: false },
+  { name: "스미스 머신 스쿼트", category: "하체", isOneArm: false },
+  { name: "스미스 머신 런지", category: "하체", isOneArm: false },
   { name: "레그 프레스", category: "하체", isOneArm: false },
   { name: "원암/원레그 레그 익스텐션", category: "하체", isOneArm: true },
   { name: "레그 컬", category: "하체", isOneArm: false },
@@ -68,14 +74,14 @@ interface ExerciseItem {
 
 interface DaySchedule {
   day: string;
-  isRest: boolean; // 휴식일 여부
-  targetCategories: string[]; // Target 부위 (예: ["가슴", "삼두"])
+  isRest: boolean;
+  targetCategories: string[];
   exercises: { name: string; category: string; isOneArm: boolean }[];
 }
 
 interface WeeklyRoutine {
   id: string;
-  name: string; // 루틴 이름 (예: 4분할 루틴, 3분할 루틴)
+  name: string;
   schedule: Record<string, DaySchedule>;
 }
 
@@ -86,24 +92,22 @@ export default function GymTracker() {
     new Date().toISOString().split("T")[0]
   );
 
-  // 생성된 주간 루틴 목록
   const [routines, setRoutines] = useState<WeeklyRoutine[]>([
     {
       id: "1",
       name: "🔥 표준 4분할 루틴",
       schedule: {
-        월요일: { day: "월요일", isRest: false, targetCategories: ["가슴", "삼두"], exercises: [{ name: "벤치프레스", category: "가슴", isOneArm: false }, { name: "원암 케이블 트라이셉스 익스텐션", category: "삼두", isOneArm: true }] },
+        월요일: { day: "월요일", isRest: false, targetCategories: ["가슴", "삼두"], exercises: [{ name: "스미스 머신 벤치프레스", category: "가슴", isOneArm: false }, { name: "원암 케이블 트라이셉스 익스텐션", category: "삼두", isOneArm: true }] },
         화요일: { day: "화요일", isRest: false, targetCategories: ["등", "이두"], exercises: [{ name: "원암 덤벨로우", category: "등", isOneArm: true }, { name: "바벨 컬", category: "이두", isOneArm: false }] },
         수요일: { day: "수요일", isRest: true, targetCategories: [], exercises: [] },
-        목요일: { day: "목요일", isRest: false, targetCategories: ["어깨"], exercises: [{ name: "오버헤드 프레스", category: "어깨", isOneArm: false }, { name: "원암 사이드 레이터럴 레이즈", category: "어깨", isOneArm: true }] },
-        금요일: { day: "금요일", isRest: false, targetCategories: ["하체"], exercises: [{ name: "스쿼트", category: "하체", isOneArm: false }, { name: "레그 프레스", category: "하체", isOneArm: false }] },
+        목요일: { day: "목요일", isRest: false, targetCategories: ["어깨"], exercises: [{ name: "스미스 머신 숄더 프레스", category: "어깨", isOneArm: false }, { name: "원암 사이드 레이터럴 레이즈", category: "어깨", isOneArm: true }] },
+        금요일: { day: "금요일", isRest: false, targetCategories: ["하체"], exercises: [{ name: "스미스 머신 스쿼트", category: "하체", isOneArm: false }, { name: "레그 프레스", category: "하체", isOneArm: false }] },
         토요일: { day: "토요일", isRest: true, targetCategories: [], exercises: [] },
         일요일: { day: "일요일", isRest: true, targetCategories: [], exercises: [] },
       },
     },
   ]);
 
-  // 기록 진행 중인 세션
   const [currentWorkout, setCurrentWorkout] = useState<{
     title: string;
     exercises: ExerciseItem[];
@@ -112,12 +116,10 @@ export default function GymTracker() {
     exercises: [],
   });
 
-  // 완료 저장된 로그
   const [workoutLogs, setWorkoutLogs] = useState<
     { date: string; title: string; exercises: ExerciseItem[] }[]
   >([]);
 
-  // 새 주간 루틴 생성 폼 상태
   const [newRoutineName, setNewRoutineName] = useState("");
   const [editingSchedule, setEditingSchedule] = useState<Record<string, DaySchedule>>(
     DAYS.reduce((acc, day) => {
@@ -126,7 +128,6 @@ export default function GymTracker() {
     }, {} as Record<string, DaySchedule>)
   );
 
-  // 특정 요일 휴식일 전환
   const toggleRestDay = (day: string) => {
     setEditingSchedule((prev) => ({
       ...prev,
@@ -138,7 +139,6 @@ export default function GymTracker() {
     }));
   };
 
-  // 특정 요일 운동 추가
   const addExerciseToScheduleDay = (day: string, exName: string) => {
     const found = EXERCISE_DATABASE.find((e) => e.name === exName);
     if (!found) return;
@@ -155,10 +155,9 @@ export default function GymTracker() {
     });
   };
 
-  // 주간 루틴 저장
   const saveWeeklyRoutine = () => {
     if (!newRoutineName) {
-      alert("루틴 이름을 입력해주세요 (예: 3분할 루틴, PPL 분할 등)");
+      alert("루틴 이름을 입력해주세요");
       return;
     }
 
@@ -173,7 +172,6 @@ export default function GymTracker() {
     alert(`'${newRoutineName}' 루틴이 저장되었습니다!`);
   };
 
-  // 선택한 날짜/요일에 맞게 루틴 가져오기
   const loadRoutineToLog = (routine: WeeklyRoutine) => {
     const dayOfWeek = new Date(selectedDate).toLocaleDateString("ko-KR", { weekday: "long" });
     const todaySchedule = routine.schedule[dayOfWeek] || routine.schedule["월요일"];
@@ -203,7 +201,6 @@ export default function GymTracker() {
     alert(`'${routine.name}'의 [${dayOfWeek}] 운동을 불러왔습니다!`);
   };
 
-  // 기록용 운동 종목 단일 추가
   const addExerciseToWorkout = (exName: string) => {
     const found = EXERCISE_DATABASE.find((e) => e.name === exName);
     if (!found) return;
@@ -226,7 +223,6 @@ export default function GymTracker() {
     }));
   };
 
-  // 세트 업데이트
   const updateSet = (exIdx: number, setIdx: number, field: keyof SetItem, val: number | boolean) => {
     setCurrentWorkout((prev) => {
       const updated = [...prev.exercises];
@@ -237,7 +233,6 @@ export default function GymTracker() {
     });
   };
 
-  // 기록 완료
   const saveWorkoutLog = () => {
     if (currentWorkout.exercises.length === 0) return;
     setWorkoutLogs([{ date: selectedDate, title: currentWorkout.title, exercises: currentWorkout.exercises }, ...workoutLogs]);
@@ -245,7 +240,6 @@ export default function GymTracker() {
     setCurrentWorkout({ title: "오늘의 운동", exercises: [] });
   };
 
-  // 카테고리 필터링된 운동 목록
   const filteredExercises = EXERCISE_DATABASE.filter((ex) => {
     if (selectedCategoryTab === "전체") return true;
     if (selectedCategoryTab === "원암 🦾") return ex.isOneArm;
@@ -254,7 +248,6 @@ export default function GymTracker() {
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 p-4 max-w-2xl mx-auto">
-      {/* 헤더 */}
       <header className="flex justify-between items-center mb-6 pb-4 border-b border-slate-800">
         <div>
           <h1 className="text-2xl font-bold text-blue-500">⚡ GYM TRACKER</h1>
@@ -268,7 +261,6 @@ export default function GymTracker() {
         />
       </header>
 
-      {/* 네비게이션 탭 */}
       <nav className="flex bg-slate-900 rounded-lg p-1 mb-6 border border-slate-800">
         <button
           onClick={() => setActiveTab("log")}
@@ -296,10 +288,8 @@ export default function GymTracker() {
         </button>
       </nav>
 
-      {/* TAB 1: 운동 기록 */}
       {activeTab === "log" && (
         <section className="space-y-6">
-          {/* 내 루틴 빠른 불러오기 */}
           <div className="bg-slate-900 p-4 rounded-xl border border-slate-800 space-y-2">
             <h3 className="text-xs font-semibold text-slate-400">⚡ 내 루틴 스케줄 불러오기</h3>
             <div className="flex gap-2 overflow-x-auto pb-1">
@@ -316,11 +306,8 @@ export default function GymTracker() {
             </div>
           </div>
 
-          {/* 부위별 카테고리 탭 운동 선택 */}
           <div className="bg-slate-900 p-4 rounded-xl border border-slate-800 space-y-3">
             <h3 className="text-sm font-semibold text-slate-300">🔍 부위별 운동 라이브러리</h3>
-            
-            {/* 부위 필터 탭 */}
             <div className="flex gap-1 overflow-x-auto pb-1">
               {CATEGORIES.map((cat) => (
                 <button
@@ -335,7 +322,6 @@ export default function GymTracker() {
               ))}
             </div>
 
-            {/* 필터링된 운동 종목 선택 */}
             <select
               onChange={(e) => {
                 if (e.target.value) {
@@ -354,7 +340,6 @@ export default function GymTracker() {
             </select>
           </div>
 
-          {/* 현재 기록 목록 */}
           <div className="space-y-4">
             {currentWorkout.exercises.length === 0 ? (
               <div className="text-center py-12 text-slate-500 bg-slate-900/40 rounded-xl border border-dashed border-slate-800">
@@ -373,7 +358,6 @@ export default function GymTracker() {
                     </div>
                   </div>
 
-                  {/* 세트 리스트 */}
                   <div className="space-y-2">
                     {ex.sets.map((s, setIdx) => (
                       <div key={setIdx} className="grid grid-cols-12 gap-2 items-center">
@@ -417,7 +401,6 @@ export default function GymTracker() {
         </section>
       )}
 
-      {/* TAB 2: 주간 분할 스케줄 설정 */}
       {activeTab === "routine" && (
         <section className="space-y-6">
           <div className="bg-slate-900 p-4 rounded-xl border border-slate-800 space-y-4">
@@ -431,7 +414,6 @@ export default function GymTracker() {
               className="w-full bg-slate-800 border border-slate-700 rounded-lg p-2.5 text-sm text-slate-100"
             />
 
-            {/* 요일별 휴식 및 운동 설정 */}
             <div className="space-y-3">
               {DAYS.map((day) => {
                 const dayConfig = editingSchedule[day];
@@ -468,7 +450,6 @@ export default function GymTracker() {
                           ))}
                         </select>
 
-                        {/* 추가된 운동 표시 */}
                         {dayConfig.exercises.length > 0 && (
                           <div className="flex flex-wrap gap-1">
                             {dayConfig.exercises.map((ex, eIdx) => (
@@ -493,7 +474,6 @@ export default function GymTracker() {
             </button>
           </div>
 
-          {/* 저장된 주간 루틴들 */}
           <div className="space-y-4">
             <h3 className="text-sm font-semibold text-slate-400">저장된 주간 루틴 목록 ({routines.length})</h3>
             {routines.map((r) => (
@@ -524,7 +504,6 @@ export default function GymTracker() {
         </section>
       )}
 
-      {/* TAB 3: 보관함 */}
       {activeTab === "history" && (
         <section className="space-y-4">
           <h3 className="text-sm font-semibold text-slate-400">저장된 운동 기록</h3>
