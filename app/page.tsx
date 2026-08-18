@@ -2,155 +2,76 @@
 
 import React, { useState, useEffect } from "react";
 
-// 방대한 운동 DB (덤벨 스쿼트 세분화 포함)
 const EXERCISE_DATABASE = [
-  // ─── 가슴 (Chest) ───
+  // ─── 가슴 ───
   { name: "바벨 벤치프레스", category: "가슴", isOneArm: false },
   { name: "덤벨 벤치프레스", category: "가슴", isOneArm: false },
   { name: "스미스 머신 벤치프레스", category: "가슴", isOneArm: false },
   { name: "체스트 프레스 머신", category: "가슴", isOneArm: false },
   { name: "바벨 인클라인 벤치프레스", category: "가슴", isOneArm: false },
   { name: "덤벨 인클라인 벤치프레스", category: "가슴", isOneArm: false },
-  { name: "스미스 머신 인클라인 벤치프레스", category: "가슴", isOneArm: false },
   { name: "인클라인 체스트 프레스 머신", category: "가슴", isOneArm: false },
-  { name: "디클라인 벤치프레스", category: "가슴", isOneArm: false },
-  { name: "덤벨 디클라인 벤치프레스", category: "가슴", isOneArm: false },
   { name: "덤벨 체스트 플라이", category: "가슴", isOneArm: false },
-  { name: "인클라인 덤벨 플라이", category: "가슴", isOneArm: false },
   { name: "펙덱 플라이 머신", category: "가슴", isOneArm: false },
   { name: "케이블 체스트 플라이", category: "가슴", isOneArm: false },
-  { name: "케이블 하이투로우 플라이", category: "가슴", isOneArm: false },
-  { name: "케이블 로우투하이 플라이", category: "가슴", isOneArm: false },
   { name: "딥스 (가슴 자극)", category: "가슴", isOneArm: false },
-  { name: "어시스트 딥스 머신", category: "가슴", isOneArm: false },
   { name: "푸쉬업 (팔굽혀펴기)", category: "가슴", isOneArm: false },
-  { name: "디클라인 푸쉬업", category: "가슴", isOneArm: false },
-  { name: "인클라인 푸쉬업", category: "가슴", isOneArm: false },
 
-  // ─── 등 (Back) ───
+  // ─── 등 ───
   { name: "풀업 (맨몸 턱걸이)", category: "등", isOneArm: false },
-  { name: "어시스트 풀업 (머신 보조)", category: "등", isOneArm: false },
-  { name: "친업 (언더그립 턱걸이)", category: "등", isOneArm: false },
+  { name: "어시스트 풀업", category: "등", isOneArm: false },
   { name: "렛풀다운 (오버그립)", category: "등", isOneArm: false },
   { name: "렛풀다운 (언더그립)", category: "등", isOneArm: false },
-  { name: "렛풀다운 (와이드그립)", category: "등", isOneArm: false },
   { name: "클로즈그립 렛풀다운", category: "등", isOneArm: false },
-  { name: "패러렐그립 렛풀다운", category: "등", isOneArm: false },
-  { name: "원암 케이블 렛풀다운", category: "등", isOneArm: true },
   { name: "컨벤셔널 데드리프트", category: "등", isOneArm: false },
   { name: "루마니안 데드리프트", category: "등", isOneArm: false },
-  { name: "렉풀 (부분 데드리프트)", category: "등", isOneArm: false },
-  { name: "바벨로우 (오버그립)", category: "등", isOneArm: false },
-  { name: "바벨로우 (언더그립)", category: "등", isOneArm: false },
-  { name: "펜들레이 로우", category: "등", isOneArm: false },
+  { name: "바벨로우", category: "등", isOneArm: false },
   { name: "덤벨로우", category: "등", isOneArm: false },
   { name: "원암 덤벨로우", category: "등", isOneArm: true },
-  { name: "시티드 케이블로우 (패러렐그립)", category: "등", isOneArm: false },
-  { name: "시티드 케이블로우 (와이드그립)", category: "등", isOneArm: false },
-  { name: "원암 케이블로우", category: "등", isOneArm: true },
+  { name: "시티드 케이블로우", category: "등", isOneArm: false },
   { name: "T바 로우", category: "등", isOneArm: false },
-  { name: "시티드 로우 머신", category: "등", isOneArm: false },
-  { name: "원암 로우 머신", category: "등", isOneArm: true },
-  { name: "케이블 암 풀다운 (스트레이트 암)", category: "등", isOneArm: false },
   { name: "백 익스텐션", category: "등", isOneArm: false },
 
-  // ─── 어깨 (Shoulders) ───
+  // ─── 어깨 ───
   { name: "[전면] 바벨 오버헤드 프레스 (OHP)", category: "어깨", isOneArm: false },
   { name: "[전면] 스미스 머신 숄더 프레스", category: "어깨", isOneArm: false },
   { name: "[전면] 덤벨 숄더 프레스", category: "어깨", isOneArm: false },
-  { name: "[전면] 아놀드 프레스", category: "어깨", isOneArm: false },
   { name: "[전면] 숄더 프레스 머신", category: "어깨", isOneArm: false },
-  { name: "[전면] 바벨 프론트 레이즈", category: "어깨", isOneArm: false },
-  { name: "[전면] 덤벨 프론트 레이즈", category: "어깨", isOneArm: false },
-  { name: "[전면] 케이블 프론트 레이즈", category: "어깨", isOneArm: false },
   { name: "[측면] 덤벨 사이드 레이터럴 레이즈", category: "어깨", isOneArm: false },
   { name: "[측면] 케이블 사이드 레이터럴 레이즈", category: "어깨", isOneArm: false },
-  { name: "[측면] 원암 케이블 사이드 레이터럴 레이즈", category: "어깨", isOneArm: true },
-  { name: "[측면] 머신 사이드 레이터럴 레이즈", category: "어깨", isOneArm: false },
-  { name: "[측면] 바벨 업라이트 로우", category: "어깨", isOneArm: false },
-  { name: "[측면] 케이블 업라이트 로우", category: "어깨", isOneArm: false },
   { name: "[후면] 덤벨 리버스 플라이", category: "후면어깨", isOneArm: false },
   { name: "[후면] 리버스 펙덱 플라이 머신", category: "후면어깨", isOneArm: false },
   { name: "[후면] 케이블 페이스풀", category: "후면어깨", isOneArm: false },
-  { name: "[후면] 벤트오버 레이터럴 레이즈", category: "후면어깨", isOneArm: false },
-  { name: "[승모] 바벨 슈러그", category: "어깨", isOneArm: false },
-  { name: "[승모] 덤벨 슈러그", category: "어깨", isOneArm: false },
 
-  // ─── 하체 (Legs) ───
+  // ─── 하체 ───
   { name: "[투레그] 바벨 백스쿼트", category: "하체", isOneArm: false },
-  { name: "[투레그] 바벨 프론트스쿼트", category: "하체", isOneArm: false },
   { name: "[투레그] 스미스 머신 스쿼트", category: "하체", isOneArm: false },
   { name: "[투레그] 덤벨 레귤러 스쿼트", category: "하체", isOneArm: false },
   { name: "[투레그] 덤벨 와이드 스쿼트", category: "하체", isOneArm: false },
   { name: "[투레그] 덤벨 고블렛 스쿼트", category: "하체", isOneArm: false },
-  { name: "[투레그] 헥 스쿼트 머신", category: "하체", isOneArm: false },
-  { name: "[투레그] V-스쿼트 머신", category: "하체", isOneArm: false },
   { name: "[투레그] 레그 프레스", category: "하체", isOneArm: false },
-  { name: "[투레그] 파워 레그 프레스", category: "하체", isOneArm: false },
   { name: "[투레그] 레그 익스텐션", category: "하체", isOneArm: false },
   { name: "[투레그] 라잉 레그 컬", category: "하체", isOneArm: false },
   { name: "[투레그] 시티드 레그 컬", category: "하체", isOneArm: false },
-  { name: "[투레그] 스티프 레그 데드리프트", category: "하체", isOneArm: false },
   { name: "[원레그] 덤벨 런지", category: "하체", isOneArm: true },
-  { name: "[원레그] 바벨 워킹 런지", category: "하체", isOneArm: true },
-  { name: "[원레그] 불가리안 스플릿 스쿼트 (보스쿠)", category: "하체", isOneArm: true },
-  { name: "[원레그] 싱글 레그 익스텐션", category: "하체", isOneArm: true },
-  { name: "[원레그] 싱글 레그 컬", category: "하체", isOneArm: true },
+  { name: "[원레그] 불가리안 스플릿 스쿼트", category: "하체", isOneArm: true },
   { name: "[엉덩이] 바벨 힙 쓰러스터", category: "하체", isOneArm: false },
-  { name: "[엉덩이] 머신 힙 쓰러스터", category: "하체", isOneArm: false },
-  { name: "[엉덩이] 이너사이 (아웃사이) 머신", category: "하체", isOneArm: false },
-  { name: "[종아리] 스탠딩 카프 레이즈", category: "하체", isOneArm: false },
-  { name: "[종아리] 시티드 카프 레이즈", category: "하체", isOneArm: false },
 
-  // ─── 삼두 (Triceps) ───
-  { name: "케이블 푸쉬다운 (일자바)", category: "삼두", isOneArm: false },
-  { name: "케이블 푸쉬다운 (로프)", category: "삼두", isOneArm: false },
-  { name: "케이블 푸쉬다운 (V바)", category: "삼두", isOneArm: false },
-  { name: "바벨 트라이셉스 익스텐션 (라잉)", category: "삼두", isOneArm: false },
-  { name: "EZ바 오버헤드 트라이셉스 익스텐션", category: "삼두", isOneArm: false },
-  { name: "덤벨 오버헤드 트라이셉스 익스텐션", category: "삼두", isOneArm: false },
-  { name: "원암 덤벨 익스텐션", category: "삼두", isOneArm: true },
-  { name: "원암 케이블 트라이셉스 익스텐션", category: "삼두", isOneArm: true },
-  { name: "클로즈그립 벤치프레스", category: "삼두", isOneArm: false },
-  { name: "덤벨 킥백", category: "삼두", isOneArm: false },
-  { name: "벤치 딥스", category: "삼두", isOneArm: false },
-
-  // ─── 이두 (Biceps) ───
+  // ─── 팔 & 복근 ───
+  { name: "케이블 푸쉬다운", category: "삼두", isOneArm: false },
+  { name: "바벨 트라이셉스 익스텐션", category: "삼두", isOneArm: false },
+  { name: "덤벨 오버헤드 익스텐션", category: "삼두", isOneArm: false },
   { name: "바벨 컬", category: "이두", isOneArm: false },
-  { name: "EZ바 컬", category: "이두", isOneArm: false },
   { name: "덤벨 컬", category: "이두", isOneArm: false },
   { name: "덤벨 해머 컬", category: "이두", isOneArm: false },
-  { name: "인클라인 덤벨 컬", category: "이두", isOneArm: false },
-  { name: "프리처 컬 (바벨/EZ바)", category: "이두", isOneArm: false },
-  { name: "머신 프리처 컬", category: "이두", isOneArm: false },
-  { name: "케이블 바이셉스 컬", category: "이두", isOneArm: false },
-  { name: "원암 케이블 컬", category: "이두", isOneArm: true },
-  { name: "컨센트레이션 컬", category: "이두", isOneArm: true },
-  { name: "리버스 바벨 컬 (전완근)", category: "이두", isOneArm: false },
-  { name: "리스토 컬 (전완근)", category: "이두", isOneArm: false },
-
-  // ─── 복근 / 코어 (Abs / Core) ───
-  { name: "플랭크", category: "복근", isOneArm: false },
-  { name: "사이드 플랭크", category: "복근", isOneArm: false },
   { name: "행잉 레그 레이즈", category: "복근", isOneArm: false },
-  { name: "행잉 닌니 레이즈", category: "복근", isOneArm: false },
   { name: "크런치", category: "복근", isOneArm: false },
-  { name: "디클라인 크런치", category: "복근", isOneArm: false },
-  { name: "케이블 크런치 (크런치 로프)", category: "복근", isOneArm: false },
-  { name: "바이시클 크런치", category: "복근", isOneArm: false },
-  { name: "라잉 레그 레이즈", category: "복근", isOneArm: false },
-  { name: "AB 슬라이드 (아브휠)", category: "복근", isOneArm: false },
-  { name: "케이블 우드칩", category: "복근", isOneArm: false },
-  { name: "러시안 트위스트", category: "복근", isOneArm: false },
-  { name: "복근 머신 (어브도미널)", category: "복근", isOneArm: false },
+  { name: "플랭크", category: "복근", isOneArm: false },
 
-  // ─── 전신 / 유산소 (Cardio & Full Body) ───
-  { name: "버피 테스트", category: "유산소", isOneArm: false },
-  { name: "케틀벨 스윙", category: "유산소", isOneArm: false },
+  // ─── 유산소 ───
   { name: "천국의 계단 (스텝밀)", category: "유산소", isOneArm: false },
-  { name: "런닝머신 (인클라인)", category: "유산소", isOneArm: false },
-  { name: "실내 자전거 (사이클)", category: "유산소", isOneArm: false },
-  { name: "로잉 머신", category: "유산소", isOneArm: false },
+  { name: "런닝머신", category: "유산소", isOneArm: false },
+  { name: "실내 자전거", category: "유산소", isOneArm: false },
 ];
 
 const DAYS = ["월요일", "화요일", "수요일", "목요일", "금요일", "토요일", "일요일"];
@@ -173,7 +94,6 @@ interface ExerciseItem {
 interface DaySchedule {
   day: string;
   isRest: boolean;
-  targetCategories: string[];
   exercises: { name: string; category: string; isOneArm: boolean }[];
 }
 
@@ -181,6 +101,12 @@ interface WeeklyRoutine {
   id: string;
   name: string;
   schedule: Record<string, DaySchedule>;
+}
+
+interface WorkoutLog {
+  date: string; // YYYY-MM-DD
+  title: string;
+  exercises: ExerciseItem[];
 }
 
 export default function GymTracker() {
@@ -194,6 +120,11 @@ export default function GymTracker() {
   const [editingRoutineId, setEditingRoutineId] = useState<string | null>(null);
   const [isLoaded, setIsLoaded] = useState(false);
 
+  // 달력 연/월 상태
+  const [calendarYear, setCalendarYear] = useState(new Date().getFullYear());
+  const [calendarMonth, setCalendarMonth] = useState(new Date().getMonth());
+  const [viewingLogDate, setViewingLogDate] = useState<string | null>(null);
+
   const [currentWorkout, setCurrentWorkout] = useState<{
     title: string;
     exercises: ExerciseItem[];
@@ -202,14 +133,12 @@ export default function GymTracker() {
     exercises: [],
   });
 
-  const [workoutLogs, setWorkoutLogs] = useState<
-    { date: string; title: string; exercises: ExerciseItem[] }[]
-  >([]);
+  const [workoutLogs, setWorkoutLogs] = useState<WorkoutLog[]>([]);
 
   const [newRoutineName, setNewRoutineName] = useState("");
   const [editingSchedule, setEditingSchedule] = useState<Record<string, DaySchedule>>(
     DAYS.reduce((acc, day) => {
-      acc[day] = { day, isRest: false, targetCategories: [], exercises: [] };
+      acc[day] = { day, isRest: false, exercises: [] };
       return acc;
     }, {} as Record<string, DaySchedule>)
   );
@@ -246,6 +175,17 @@ export default function GymTracker() {
   useEffect(() => {
     if (isLoaded) localStorage.setItem("gym_logs", JSON.stringify(workoutLogs));
   }, [workoutLogs, isLoaded]);
+
+  // 날짜가 변경될 때 기존 해당 날짜의 운동 기록 불러오기
+  useEffect(() => {
+    const existingLog = workoutLogs.find((l) => l.date === selectedDate);
+    if (existingLog) {
+      setCurrentWorkout({
+        title: existingLog.title,
+        exercises: JSON.parse(JSON.stringify(existingLog.exercises)),
+      });
+    }
+  }, [selectedDate, workoutLogs]);
 
   const getLastSetData = (exerciseName: string): SetItem[] => {
     for (const log of workoutLogs) {
@@ -312,7 +252,7 @@ export default function GymTracker() {
     setNewRoutineName("");
     setEditingSchedule(
       DAYS.reduce((acc, day) => {
-        acc[day] = { day, isRest: false, targetCategories: [], exercises: [] };
+        acc[day] = { day, isRest: false, exercises: [] };
         return acc;
       }, {} as Record<string, DaySchedule>)
     );
@@ -332,7 +272,7 @@ export default function GymTracker() {
             : r
         )
       );
-      alert(`'${newRoutineName}' 루틴 수정이 완료되었습니다.`);
+      alert(`'${newRoutineName}' 루틴 수정 완료`);
     } else {
       const created: WeeklyRoutine = {
         id: Date.now().toString(),
@@ -340,7 +280,7 @@ export default function GymTracker() {
         schedule: JSON.parse(JSON.stringify(editingSchedule)),
       };
       setRoutines((prev) => [...prev, created]);
-      alert(`'${newRoutineName}' 새 루틴이 저장되었습니다.`);
+      alert(`'${newRoutineName}' 새 루틴 저장 완료`);
     }
 
     cancelEditRoutine();
@@ -358,7 +298,7 @@ export default function GymTracker() {
     const todaySchedule = routine.schedule[dayOfWeek] || routine.schedule["월요일"];
 
     if (todaySchedule.isRest) {
-      alert(`선택한 날짜(${selectedDate}, ${dayOfWeek})는 '${routine.name}' 기준 [휴식일]입니다.`);
+      alert(`선택한 날짜(${selectedDate}, ${dayOfWeek})는 [휴식일]입니다.`);
       return;
     }
 
@@ -403,7 +343,6 @@ export default function GymTracker() {
     });
   };
 
-  // 세트 데이터 변경 (숫자 포맷 버그 수정)
   const updateSet = (exIdx: number, setIdx: number, field: keyof SetItem, val: string | boolean) => {
     setCurrentWorkout((prev) => {
       const updated = [...prev.exercises];
@@ -412,7 +351,6 @@ export default function GymTracker() {
       if (field === "completed") {
         targetSets[setIdx] = { ...targetSets[setIdx], completed: Boolean(val) };
       } else {
-        // 숫자 포맷 정제: 0으로 시작하는 유효치 처리
         let cleanVal: number | string = val as string;
         if (cleanVal !== "") {
           cleanVal = Number(cleanVal);
@@ -426,7 +364,6 @@ export default function GymTracker() {
     });
   };
 
-  // 세트 추가
   const addSetToExercise = (exIdx: number) => {
     setCurrentWorkout((prev) => {
       const updated = [...prev.exercises];
@@ -445,14 +382,12 @@ export default function GymTracker() {
     });
   };
 
-  // 세트 삭제 기능 구현
   const deleteSetFromExercise = (exIdx: number, setIdx: number) => {
     setCurrentWorkout((prev) => {
       const updated = [...prev.exercises];
       const targetSets = [...updated[exIdx].sets];
       targetSets.splice(setIdx, 1);
 
-      // 세트 번호 재정렬
       const renumberedSets = targetSets.map((s, idx) => ({
         ...s,
         setNumber: idx + 1,
@@ -463,10 +398,13 @@ export default function GymTracker() {
     });
   };
 
+  // 동일한 날짜 중복 저장 방지 -> 덮어쓰기 로직 적용
   const saveWorkoutLog = () => {
-    if (currentWorkout.exercises.length === 0) return;
+    if (currentWorkout.exercises.length === 0) {
+      alert("기록할 운동 종목이 없습니다.");
+      return;
+    }
 
-    // 저장 전 빈 문자열 데이터를 0으로 정제
     const cleanedExercises = currentWorkout.exercises.map((ex) => ({
       ...ex,
       sets: ex.sets.map((s) => ({
@@ -476,12 +414,23 @@ export default function GymTracker() {
       })),
     }));
 
-    setWorkoutLogs((prev) => [
-      { date: selectedDate, title: currentWorkout.title, exercises: cleanedExercises },
-      ...prev,
-    ]);
-    alert("오늘 운동 기록이 저장되었습니다!");
-    setCurrentWorkout({ title: "오늘의 운동", exercises: [] });
+    const newLogItem: WorkoutLog = {
+      date: selectedDate,
+      title: currentWorkout.title,
+      exercises: cleanedExercises,
+    };
+
+    setWorkoutLogs((prev) => {
+      const existingIdx = prev.findIndex((l) => l.date === selectedDate);
+      if (existingIdx !== -1) {
+        const updated = [...prev];
+        updated[existingIdx] = newLogItem;
+        return updated;
+      }
+      return [newLogItem, ...prev];
+    });
+
+    alert(`${selectedDate} 운동 기록이 업데이트 저장되었습니다!`);
   };
 
   const filteredExercises = EXERCISE_DATABASE.filter((ex) => {
@@ -490,12 +439,77 @@ export default function GymTracker() {
     return ex.category === selectedCategoryTab;
   });
 
+  // 달력 생성을 위한 헬퍼 함수
+  const renderCalendar = () => {
+    const firstDayOfMonth = new Date(calendarYear, calendarMonth, 1).getDay();
+    const daysInMonth = new Date(calendarYear, calendarMonth + 1, 0).getDate();
+
+    const calendarCells = [];
+
+    // 빈 칸 (첫 주 시작 요일 전)
+    for (let i = 0; i < firstDayOfMonth; i++) {
+      calendarCells.push(<div key={`empty-${i}`} className="h-20 bg-slate-900/20 rounded-lg"></div>);
+    }
+
+    // 날짜 칸
+    for (let day = 1; day <= daysInMonth; day++) {
+      const monthStr = String(calendarMonth + 1).padStart(2, "0");
+      const dayStr = String(day).padStart(2, "0");
+      const dateKey = `${calendarYear}-${monthStr}-${dayStr}`;
+
+      const logForDay = workoutLogs.find((l) => l.date === dateKey);
+
+      // 해당 날짜 수행 부위 추출 (중복 제거)
+      const categoriesDone = logForDay
+        ? Array.from(new Set(logForDay.exercises.map((e) => e.category)))
+        : [];
+
+      calendarCells.push(
+        <div
+          key={dateKey}
+          onClick={() => setViewingLogDate(dateKey)}
+          className={`h-20 p-1.5 rounded-lg border text-left cursor-pointer transition-all flex flex-col justify-between ${
+            logForDay
+              ? "bg-slate-800/80 border-blue-500/50 hover:border-blue-400"
+              : "bg-slate-900/40 border-slate-800/60 hover:bg-slate-800/40"
+          }`}
+        >
+          <div className="flex justify-between items-center">
+            <span
+              className={`text-xs font-bold ${
+                dateKey === selectedDate ? "text-blue-400 underline" : "text-slate-300"
+              }`}
+            >
+              {day}
+            </span>
+            {logForDay && <span className="w-1.5 h-1.5 bg-blue-500 rounded-full"></span>}
+          </div>
+
+          <div className="flex flex-wrap gap-0.5 mt-1 overflow-hidden">
+            {categoriesDone.map((cat, i) => (
+              <span
+                key={i}
+                className="bg-blue-900/80 text-blue-200 text-[9px] px-1 py-0.2 rounded font-semibold"
+              >
+                {cat}
+              </span>
+            ))}
+          </div>
+        </div>
+      );
+    }
+
+    return calendarCells;
+  };
+
+  const selectedLogDetail = workoutLogs.find((l) => l.date === viewingLogDate);
+
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 p-4 max-w-2xl mx-auto">
       <header className="flex justify-between items-center mb-6 pb-4 border-b border-slate-800">
         <div>
           <h1 className="text-2xl font-bold text-blue-500">⚡ GYM TRACKER</h1>
-          <p className="text-xs text-slate-400">120+ 운동 종목 & 편리한 세트 관리</p>
+          <p className="text-xs text-slate-400">날짜별 세트 기록 및 운동 달력</p>
         </div>
         <input
           type="date"
@@ -520,7 +534,7 @@ export default function GymTracker() {
             activeTab === "routine" ? "bg-blue-600 text-white" : "text-slate-400"
           }`}
         >
-          📋 루틴 목록 ({routines.length})
+          📋 루틴 목록
         </button>
         <button
           onClick={() => setActiveTab("history")}
@@ -528,16 +542,17 @@ export default function GymTracker() {
             activeTab === "history" ? "bg-blue-600 text-white" : "text-slate-400"
           }`}
         >
-          📅 기록 보관함 ({workoutLogs.length})
+          📅 기록 달력
         </button>
       </nav>
 
+      {/* 1. 운동 기록 탭 */}
       {activeTab === "log" && (
         <section className="space-y-6">
           <div className="bg-slate-900 p-4 rounded-xl border border-slate-800 space-y-2">
-            <h3 className="text-xs font-semibold text-slate-400">⚡ 내 루틴 불러오기</h3>
+            <h3 className="text-xs font-semibold text-slate-400">⚡ 루틴에서 불러오기</h3>
             {routines.length === 0 ? (
-              <p className="text-xs text-slate-500 py-1">[루틴 목록] 탭에서 루틴을 작성해주세요.</p>
+              <p className="text-xs text-slate-500 py-1">[루틴 목록] 탭에서 먼저 루틴을 작성하세요.</p>
             ) : (
               <div className="flex gap-2 overflow-x-auto pb-1">
                 {routines.map((r) => (
@@ -547,7 +562,7 @@ export default function GymTracker() {
                     className="bg-slate-800 hover:bg-blue-900/50 border border-slate-700 text-xs px-3 py-2 rounded-lg text-left whitespace-nowrap"
                   >
                     <div className="font-bold text-slate-200">{r.name}</div>
-                    <div className="text-[10px] text-blue-400">오늘 요일 루틴 불러오기 ➔</div>
+                    <div className="text-[10px] text-blue-400">오늘 요일 종목 세팅 ➔</div>
                   </button>
                 ))}
               </div>
@@ -555,7 +570,7 @@ export default function GymTracker() {
           </div>
 
           <div className="bg-slate-900 p-4 rounded-xl border border-slate-800 space-y-3">
-            <h3 className="text-sm font-semibold text-slate-300">🔍 개별 종목 추가</h3>
+            <h3 className="text-sm font-semibold text-slate-300">🔍 종목 추가하기</h3>
             <div className="flex gap-1 overflow-x-auto pb-1">
               {CATEGORIES.map((cat) => (
                 <button
@@ -589,9 +604,15 @@ export default function GymTracker() {
           </div>
 
           <div className="space-y-4">
+            <div className="flex justify-between items-center px-1">
+              <span className="text-xs text-slate-400 font-semibold">
+                선택된 날짜: <span className="text-blue-400 font-bold">{selectedDate}</span>
+              </span>
+            </div>
+
             {currentWorkout.exercises.length === 0 ? (
               <div className="text-center py-12 text-slate-500 bg-slate-900/40 rounded-xl border border-dashed border-slate-800">
-                루틴을 선택하거나 종목을 직접 추가해 진행하세요.
+                종목을 추가하거나 루틴을 불러와 오늘 진행한 무게와 횟수를 기록하세요.
               </div>
             ) : (
               currentWorkout.exercises.map((ex, exIdx) => (
@@ -650,7 +671,6 @@ export default function GymTracker() {
                         <button
                           onClick={() => deleteSetFromExercise(exIdx, setIdx)}
                           className="col-span-1 text-center text-xs text-red-500 hover:text-red-400 font-bold"
-                          title="세트 삭제"
                         >
                           ✕
                         </button>
@@ -673,24 +693,22 @@ export default function GymTracker() {
               onClick={saveWorkoutLog}
               className="w-full py-3 bg-emerald-600 hover:bg-emerald-500 font-bold text-white rounded-xl shadow-lg"
             >
-              💾 오늘 운동 완료 및 기록 저장
+              💾 {selectedDate} 운동 기록 저장
             </button>
           )}
         </section>
       )}
 
+      {/* 2. 루틴 설정 탭 */}
       {activeTab === "routine" && (
         <section className="space-y-6">
           <div className="bg-slate-900 p-4 rounded-xl border border-slate-800 space-y-4">
             <div className="flex justify-between items-center">
               <h3 className="text-base font-bold text-slate-200">
-                {editingRoutineId ? "✏️ 루틴 수정하기" : "🗓️ 새 루틴 만들기"}
+                {editingRoutineId ? "✏️ 루틴 수정" : "🗓️ 새 루틴 구성"}
               </h3>
               {editingRoutineId && (
-                <button
-                  onClick={cancelEditRoutine}
-                  className="text-xs text-slate-400 hover:text-slate-200 underline"
-                >
+                <button onClick={cancelEditRoutine} className="text-xs text-slate-400 underline">
                   취소
                 </button>
               )}
@@ -698,7 +716,7 @@ export default function GymTracker() {
 
             <input
               type="text"
-              placeholder="루틴 이름 (예: 내 맞춤 3분할)"
+              placeholder="루틴 이름 (예: 주 3회 상하체 분할)"
               value={newRoutineName}
               onChange={(e) => setNewRoutineName(e.target.value)}
               className="w-full bg-slate-800 border border-slate-700 rounded-lg p-2.5 text-sm text-slate-100"
@@ -714,7 +732,9 @@ export default function GymTracker() {
                       <button
                         onClick={() => toggleRestDay(day)}
                         className={`text-xs px-2.5 py-1 rounded font-bold ${
-                          dayConfig.isRest ? "bg-red-900/60 text-red-300 border border-red-700" : "bg-emerald-900/60 text-emerald-300 border border-emerald-700"
+                          dayConfig.isRest
+                            ? "bg-red-900/60 text-red-300 border border-red-700"
+                            : "bg-emerald-900/60 text-emerald-300 border border-emerald-700"
                         }`}
                       >
                         {dayConfig.isRest ? "💤 휴식일" : "🏋️ 운동일"}
@@ -732,7 +752,7 @@ export default function GymTracker() {
                           }}
                           className="w-full bg-slate-900 border border-slate-700 text-xs text-slate-300 rounded p-1.5"
                         >
-                          <option value="">+ {day} 운동 추가</option>
+                          <option value="">+ {day} 운동 종목 추가</option>
                           {EXERCISE_DATABASE.map((ex, idx) => (
                             <option key={idx} value={ex.name}>
                               [{ex.category}] {ex.name}
@@ -743,11 +763,14 @@ export default function GymTracker() {
                         {dayConfig.exercises.length > 0 && (
                           <div className="flex flex-wrap gap-1">
                             {dayConfig.exercises.map((ex, eIdx) => (
-                              <span key={eIdx} className="bg-slate-900 text-xs text-blue-300 px-2 py-0.5 rounded border border-slate-700 flex items-center gap-1">
+                              <span
+                                key={eIdx}
+                                className="bg-slate-900 text-xs text-blue-300 px-2 py-0.5 rounded border border-slate-700 flex items-center gap-1"
+                              >
                                 {ex.name}
                                 <button
                                   onClick={() => removeExerciseFromScheduleDay(day, eIdx)}
-                                  className="text-red-400 hover:text-red-300 font-bold ml-1 text-[10px]"
+                                  className="text-red-400 font-bold ml-1 text-[10px]"
                                 >
                                   ✕
                                 </button>
@@ -766,12 +789,12 @@ export default function GymTracker() {
               onClick={saveWeeklyRoutine}
               className="w-full py-3 bg-blue-600 hover:bg-blue-500 font-bold rounded-lg text-sm text-white"
             >
-              {editingRoutineId ? "💾 수정완료 및 저장" : "💾 새 루틴 저장"}
+              💾 루틴 저장하기
             </button>
           </div>
 
           <div className="space-y-4">
-            <h3 className="text-sm font-semibold text-slate-400">저장된 루틴 목록 ({routines.length})</h3>
+            <h3 className="text-sm font-semibold text-slate-400">내 루틴 목록 ({routines.length})</h3>
             {routines.map((r) => (
               <div key={r.id} className="bg-slate-900 p-4 rounded-xl border border-slate-800 space-y-3">
                 <div className="flex justify-between items-center border-b border-slate-800 pb-2">
@@ -789,24 +812,7 @@ export default function GymTracker() {
                     >
                       🗑️ 삭제
                     </button>
-                    <button
-                      onClick={() => loadRoutineToLog(r)}
-                      className="bg-blue-600 text-white text-xs px-3 py-1 rounded-lg font-bold"
-                    >
-                      불러오기 ➔
-                    </button>
                   </div>
-                </div>
-                <div className="grid grid-cols-7 gap-1 text-[11px] text-center">
-                  {DAYS.map((day) => {
-                    const sched = r.schedule[day];
-                    return (
-                      <div key={day} className={`p-1.5 rounded ${sched?.isRest ? "bg-slate-800/40 text-slate-500" : "bg-blue-950/40 text-blue-300 font-semibold"}`}>
-                        <div>{day.replace("요일", "")}</div>
-                        <div className="text-[9px] mt-0.5">{sched?.isRest ? "휴식" : `${sched?.exercises.length || 0}개`}</div>
-                      </div>
-                    );
-                  })}
                 </div>
               </div>
             ))}
@@ -814,25 +820,101 @@ export default function GymTracker() {
         </section>
       )}
 
+      {/* 3. 기록 달력 탭 */}
       {activeTab === "history" && (
-        <section className="space-y-4">
-          <h3 className="text-sm font-semibold text-slate-400">운동 기록</h3>
-          {workoutLogs.map((log, idx) => (
-            <div key={idx} className="bg-slate-900 p-4 rounded-xl border border-slate-800 space-y-2">
-              <div className="flex justify-between items-center border-b border-slate-800 pb-2">
-                <span className="text-xs text-slate-400">{log.date}</span>
-                <span className="font-bold text-sm text-slate-200">{log.title}</span>
-              </div>
-              {log.exercises.map((ex, eIdx) => (
-                <div key={eIdx} className="text-xs text-slate-300 space-y-1">
-                  <div className="font-semibold text-blue-400">[{ex.category}] {ex.name}</div>
-                  <div className="pl-2 text-slate-400 text-[11px]">
-                    {ex.sets.map((s) => `${s.setNumber}세트: ${s.weight}kg x ${s.reps}회`).join(" | ")}
-                  </div>
-                </div>
-              ))}
+        <section className="space-y-6">
+          <div className="bg-slate-900 p-4 rounded-xl border border-slate-800 space-y-4">
+            <div className="flex justify-between items-center">
+              <button
+                onClick={() => {
+                  if (calendarMonth === 0) {
+                    setCalendarMonth(11);
+                    setCalendarYear((prev) => prev - 1);
+                  } else {
+                    setCalendarMonth((prev) => prev - 1);
+                  }
+                }}
+                className="bg-slate-800 px-3 py-1 rounded text-xs text-slate-300 font-bold"
+              >
+                ◀ 이전달
+              </button>
+              <h3 className="font-bold text-slate-100">
+                {calendarYear}년 {calendarMonth + 1}월
+              </h3>
+              <button
+                onClick={() => {
+                  if (calendarMonth === 11) {
+                    setCalendarMonth(0);
+                    setCalendarYear((prev) => prev + 1);
+                  } else {
+                    setCalendarMonth((prev) => prev + 1);
+                  }
+                }}
+                className="bg-slate-800 px-3 py-1 rounded text-xs text-slate-300 font-bold"
+              >
+                다음달 ▶
+              </button>
             </div>
-          ))}
+
+            <div className="grid grid-cols-7 gap-1 text-center text-xs font-bold text-slate-400 border-b border-slate-800 pb-2">
+              <span className="text-red-400">일</span>
+              <span>월</span>
+              <span>화</span>
+              <span>수</span>
+              <span>목</span>
+              <span>금</span>
+              <span className="text-blue-400">토</span>
+            </div>
+
+            <div className="grid grid-cols-7 gap-1">{renderCalendar()}</div>
+          </div>
+
+          {/* 달력에서 클릭한 날짜의 상세 기록 카드 */}
+          {viewingLogDate && (
+            <div className="bg-slate-900 p-4 rounded-xl border border-blue-500/50 space-y-3">
+              <div className="flex justify-between items-center border-b border-slate-800 pb-2">
+                <h4 className="font-bold text-slate-100">
+                  📅 {viewingLogDate} 운동 상세
+                </h4>
+                <button
+                  onClick={() => {
+                    setSelectedDate(viewingLogDate);
+                    setActiveTab("log");
+                  }}
+                  className="bg-blue-600 text-white text-xs px-2.5 py-1 rounded font-bold"
+                >
+                  수정하러 가기 ➔
+                </button>
+              </div>
+
+              {!selectedLogDetail ? (
+                <p className="text-xs text-slate-500 text-center py-4">
+                  해당 날짜에 저장된 운동 기록이 없습니다.
+                </p>
+              ) : (
+                <div className="space-y-3">
+                  {selectedLogDetail.exercises.map((ex, exIdx) => (
+                    <div key={exIdx} className="bg-slate-800/50 p-3 rounded-lg border border-slate-700/50">
+                      <div className="flex items-center gap-2 mb-2">
+                        <span className="bg-blue-900 text-blue-300 text-[10px] px-1.5 py-0.5 rounded font-bold">
+                          {ex.category}
+                        </span>
+                        <span className="font-bold text-xs text-slate-200">{ex.name}</span>
+                      </div>
+                      <div className="grid grid-cols-3 gap-2 text-xs text-slate-300">
+                        {ex.sets.map((s) => (
+                          <div key={s.setNumber} className="bg-slate-900/80 p-1.5 rounded text-center">
+                            <div className="text-[10px] text-slate-500">{s.setNumber}세트</div>
+                            <div className="font-bold text-blue-400">{s.weight}kg × {s.reps}회</div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
         </section>
       )}
     </div>
