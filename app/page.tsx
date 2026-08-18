@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 
-// 방대한 운동 DB (120+ 종목 포함)
+// 방대한 운동 DB (덤벨 스쿼트 세분화 포함)
 const EXERCISE_DATABASE = [
   // ─── 가슴 (Chest) ───
   { name: "바벨 벤치프레스", category: "가슴", isOneArm: false },
@@ -80,6 +80,9 @@ const EXERCISE_DATABASE = [
   { name: "[투레그] 바벨 백스쿼트", category: "하체", isOneArm: false },
   { name: "[투레그] 바벨 프론트스쿼트", category: "하체", isOneArm: false },
   { name: "[투레그] 스미스 머신 스쿼트", category: "하체", isOneArm: false },
+  { name: "[투레그] 덤벨 레귤러 스쿼트", category: "하체", isOneArm: false },
+  { name: "[투레그] 덤벨 와이드 스쿼트", category: "하체", isOneArm: false },
+  { name: "[투레그] 덤벨 고블렛 스쿼트", category: "하체", isOneArm: false },
   { name: "[투레그] 헥 스쿼트 머신", category: "하체", isOneArm: false },
   { name: "[투레그] V-스쿼트 머신", category: "하체", isOneArm: false },
   { name: "[투레그] 레그 프레스", category: "하체", isOneArm: false },
@@ -155,8 +158,8 @@ const CATEGORIES = ["전체", "가슴", "등", "어깨", "후면어깨", "하체
 
 interface SetItem {
   setNumber: number;
-  weight: number;
-  reps: number;
+  weight: number | string;
+  reps: number | string;
   completed: boolean;
 }
 
@@ -218,9 +221,7 @@ export default function GymTracker() {
     if (savedRoutines) {
       try {
         const parsed = JSON.parse(savedRoutines);
-        if (Array.isArray(parsed)) {
-          setRoutines(parsed);
-        }
+        if (Array.isArray(parsed)) setRoutines(parsed);
       } catch (e) {
         console.error("루틴 로드 오류", e);
       }
@@ -229,9 +230,7 @@ export default function GymTracker() {
     if (savedLogs) {
       try {
         const parsedLogs = JSON.parse(savedLogs);
-        if (Array.isArray(parsedLogs)) {
-          setWorkoutLogs(parsedLogs);
-        }
+        if (Array.isArray(parsedLogs)) setWorkoutLogs(parsedLogs);
       } catch (e) {
         console.error("기록 로드 오류", e);
       }
@@ -241,15 +240,11 @@ export default function GymTracker() {
   }, []);
 
   useEffect(() => {
-    if (isLoaded) {
-      localStorage.setItem("gym_routines", JSON.stringify(routines));
-    }
+    if (isLoaded) localStorage.setItem("gym_routines", JSON.stringify(routines));
   }, [routines, isLoaded]);
 
   useEffect(() => {
-    if (isLoaded) {
-      localStorage.setItem("gym_logs", JSON.stringify(workoutLogs));
-    }
+    if (isLoaded) localStorage.setItem("gym_logs", JSON.stringify(workoutLogs));
   }, [workoutLogs, isLoaded]);
 
   const getLastSetData = (exerciseName: string): SetItem[] => {
@@ -286,29 +281,22 @@ export default function GymTracker() {
       ? { name: found.name, category: found.category, isOneArm: found.isOneArm }
       : { name: exName, category: "기타", isOneArm: false };
 
-    setEditingSchedule((prev) => {
-      const currentDay = prev[day];
-      return {
-        ...prev,
-        [day]: {
-          ...currentDay,
-          exercises: [...currentDay.exercises, exerciseToAdd],
-        },
-      };
-    });
+    setEditingSchedule((prev) => ({
+      ...prev,
+      [day]: {
+        ...prev[day],
+        exercises: [...prev[day].exercises, exerciseToAdd],
+      },
+    }));
   };
 
   const removeExerciseFromScheduleDay = (day: string, exIdx: number) => {
     setEditingSchedule((prev) => {
-      const currentDay = prev[day];
-      const updatedExercises = [...currentDay.exercises];
+      const updatedExercises = [...prev[day].exercises];
       updatedExercises.splice(exIdx, 1);
       return {
         ...prev,
-        [day]: {
-          ...currentDay,
-          exercises: updatedExercises,
-        },
+        [day]: { ...prev[day], exercises: updatedExercises },
       };
     });
   };
@@ -407,16 +395,38 @@ export default function GymTracker() {
     }));
   };
 
-  const updateSet = (exIdx: number, setIdx: number, field: keyof SetItem, val: number | boolean) => {
+  const removeExerciseFromWorkout = (exIdx: number) => {
+    setCurrentWorkout((prev) => {
+      const updated = [...prev.exercises];
+      updated.splice(exIdx, 1);
+      return { ...prev, exercises: updated };
+    });
+  };
+
+  // 세트 데이터 변경 (숫자 포맷 버그 수정)
+  const updateSet = (exIdx: number, setIdx: number, field: keyof SetItem, val: string | boolean) => {
     setCurrentWorkout((prev) => {
       const updated = [...prev.exercises];
       const targetSets = [...updated[exIdx].sets];
-      targetSets[setIdx] = { ...targetSets[setIdx], [field]: val };
+
+      if (field === "completed") {
+        targetSets[setIdx] = { ...targetSets[setIdx], completed: Boolean(val) };
+      } else {
+        // 숫자 포맷 정제: 0으로 시작하는 유효치 처리
+        let cleanVal: number | string = val as string;
+        if (cleanVal !== "") {
+          cleanVal = Number(cleanVal);
+          if (isNaN(cleanVal)) cleanVal = "";
+        }
+        targetSets[setIdx] = { ...targetSets[setIdx], [field]: cleanVal };
+      }
+
       updated[exIdx].sets = targetSets;
       return { ...prev, exercises: updated };
     });
   };
 
+  // 세트 추가
   const addSetToExercise = (exIdx: number) => {
     setCurrentWorkout((prev) => {
       const updated = [...prev.exercises];
@@ -435,10 +445,39 @@ export default function GymTracker() {
     });
   };
 
+  // 세트 삭제 기능 구현
+  const deleteSetFromExercise = (exIdx: number, setIdx: number) => {
+    setCurrentWorkout((prev) => {
+      const updated = [...prev.exercises];
+      const targetSets = [...updated[exIdx].sets];
+      targetSets.splice(setIdx, 1);
+
+      // 세트 번호 재정렬
+      const renumberedSets = targetSets.map((s, idx) => ({
+        ...s,
+        setNumber: idx + 1,
+      }));
+
+      updated[exIdx].sets = renumberedSets;
+      return { ...prev, exercises: updated };
+    });
+  };
+
   const saveWorkoutLog = () => {
     if (currentWorkout.exercises.length === 0) return;
+
+    // 저장 전 빈 문자열 데이터를 0으로 정제
+    const cleanedExercises = currentWorkout.exercises.map((ex) => ({
+      ...ex,
+      sets: ex.sets.map((s) => ({
+        ...s,
+        weight: s.weight === "" ? 0 : Number(s.weight),
+        reps: s.reps === "" ? 0 : Number(s.reps),
+      })),
+    }));
+
     setWorkoutLogs((prev) => [
-      { date: selectedDate, title: currentWorkout.title, exercises: currentWorkout.exercises },
+      { date: selectedDate, title: currentWorkout.title, exercises: cleanedExercises },
       ...prev,
     ]);
     alert("오늘 운동 기록이 저장되었습니다!");
@@ -456,7 +495,7 @@ export default function GymTracker() {
       <header className="flex justify-between items-center mb-6 pb-4 border-b border-slate-800">
         <div>
           <h1 className="text-2xl font-bold text-blue-500">⚡ GYM TRACKER</h1>
-          <p className="text-xs text-slate-400">120+ 운동 종목 탑재 및 데이터 완전 보존</p>
+          <p className="text-xs text-slate-400">120+ 운동 종목 & 편리한 세트 관리</p>
         </div>
         <input
           type="date"
@@ -564,30 +603,41 @@ export default function GymTracker() {
                       </span>
                       <h4 className="font-bold text-slate-100">{ex.name}</h4>
                     </div>
+                    <button
+                      onClick={() => removeExerciseFromWorkout(exIdx)}
+                      className="text-xs text-red-400 hover:text-red-300 font-bold"
+                    >
+                      종목 삭제
+                    </button>
                   </div>
 
                   <div className="space-y-2">
                     <div className="grid grid-cols-12 gap-2 text-[10px] text-slate-400 text-center font-bold">
                       <span className="col-span-2">세트</span>
                       <span className="col-span-4">무게 (kg)</span>
-                      <span className="col-span-4">횟수</span>
+                      <span className="col-span-3">횟수</span>
                       <span className="col-span-2">완료</span>
+                      <span className="col-span-1">삭제</span>
                     </div>
 
                     {ex.sets.map((s, setIdx) => (
                       <div key={setIdx} className="grid grid-cols-12 gap-2 items-center">
                         <span className="col-span-2 text-center text-xs text-slate-400">{s.setNumber}세트</span>
                         <input
-                          type="number"
+                          type="text"
+                          inputMode="numeric"
                           value={s.weight}
-                          onChange={(e) => updateSet(exIdx, setIdx, "weight", Number(e.target.value))}
+                          onChange={(e) => updateSet(exIdx, setIdx, "weight", e.target.value)}
+                          placeholder="0"
                           className="col-span-4 bg-slate-800 text-center text-sm rounded border border-slate-700 p-1 font-semibold text-blue-400"
                         />
                         <input
-                          type="number"
+                          type="text"
+                          inputMode="numeric"
                           value={s.reps}
-                          onChange={(e) => updateSet(exIdx, setIdx, "reps", Number(e.target.value))}
-                          className="col-span-4 bg-slate-800 text-center text-sm rounded border border-slate-700 p-1 font-semibold text-blue-400"
+                          onChange={(e) => updateSet(exIdx, setIdx, "reps", e.target.value)}
+                          placeholder="0"
+                          className="col-span-3 bg-slate-800 text-center text-sm rounded border border-slate-700 p-1 font-semibold text-blue-400"
                         />
                         <button
                           onClick={() => updateSet(exIdx, setIdx, "completed", !s.completed)}
@@ -596,6 +646,13 @@ export default function GymTracker() {
                           }`}
                         >
                           {s.completed ? "✓" : "-"}
+                        </button>
+                        <button
+                          onClick={() => deleteSetFromExercise(exIdx, setIdx)}
+                          className="col-span-1 text-center text-xs text-red-500 hover:text-red-400 font-bold"
+                          title="세트 삭제"
+                        >
+                          ✕
                         </button>
                       </div>
                     ))}
