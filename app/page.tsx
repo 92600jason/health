@@ -1,503 +1,591 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
+import React, { useState } from "react";
 
-// 부위별 운동 데이터베이스
-const EXERCISE_LIST: Record<string, string[]> = {
-  가슴: [
-    '바벨 벤치프레스 (프리)', '덤벨 벤치프레스 (프리)', '인클라인 바벨 벤치프레스 (프리)', '인클라인 덤벨 벤치프레스 (프리)',
-    '스미스 머신 플랫 벤치프레스', '스미스 머신 인클라인 벤치프레스', '스미스 머신 디클라인 벤치프레스',
-    '체스트 프레스 머신 (머신)', '인클라인 체스트 프레스 머신 (머신)', '펙덱 플라이 머신 (머신)',
-    '케이블 크로스오버 (케이블)', '푸시업 (맨몸)', '딥스 (가슴 자극) (맨몸)'
-  ],
-  등: [
-    '컨벤셔널 데드리프트 (프리)', '루마니안 데드리프트 (프리)', '바벨 벤트오버 로우 (프리)', '원암 덤벨 로우 (프리)',
-    '스미스 머신 바벨 로우',
-    '랫풀다운 (머신)', '시티드 케이블 로우 (머신)', '어시스트 풀업 머신 (머신)',
-    '케이블 암 풀다운 (케이블)', '풀업 (턱걸이) (맨몸)'
-  ],
-  어깨: [
-    '오버헤드 프레스 (OHP) (프리)', '덤벨 숄더 프레스 (프리)', '덤벨 사이드 레터럴 레이즈 (프리)',
-    '스미스 머신 숄더 프레스',
-    '숄더 프레스 머신 (머신)', '리버스 펙덱 플라이 (후면) (머신)',
-    '케이블 사이드 레터럴 레이즈 (케이블)'
-  ],
-  하체: [
-    '바벨 백 스쿼트 (프리)', '덤벨 고블렛 스쿼트 (프리)', '바벨 런지 (프리)',
-    '스미스 머신 스쿼트', '스미스 머신 런지', '스미스 머신 스플릿 스쿼트',
-    '레그 프레스 (머신)', '레그 익스텐션 (머신)', '라이잉 레그 컬 (머신)', '이너 쓰아이/아웃타이 머신 (머신)'
-  ],
-  삼두: [
-    '라잉 트라이셉스 익스텐션 (프리)', '덤벨 오버헤드 익스텐션 (프리)',
-    '케이블 트라이셉스 푸시다운 (바)', '케이블 트라이셉스 푸시다운 (로프)'
-  ],
-  이두: [
-    '바벨 컬 (프리)', '덤벨 컬 (프리)', '덤벨 해머 컬 (프리)',
-    '암 컬 머신 (머신)', '케이블 바벨 컬 (케이블)'
-  ],
-  '복근 / 기타': [
-    '행잉 레그 레이즈', '크런치', '플랭크', '케이블 크런치', '악력기 훈련'
-  ]
-};
+// 부위별 확장된 운동 데이터 베이스 (원암 및 주요 일반 운동)
+const EXERCISE_DATABASE = [
+  // 가슴
+  { name: "벤치프레스", category: "가슴", isOneArm: false },
+  { name: "인클라인 벤치프레스", category: "가슴", isOneArm: false },
+  { name: "덤벨 프레스", category: "가슴", isOneArm: false },
+  { name: "원암 덤벨 프레스", category: "가슴", isOneArm: true },
+  { name: "체스트 플라이", category: "가슴", isOneArm: false },
+  { name: "원암 케이블 체스트 플라이", category: "가슴", isOneArm: true },
+  { name: "딥스", category: "가슴", isOneArm: false },
 
-interface LogSet {
-  id: string;
-  date: string;
-  splitDay: string;
-  category: string;
-  exercise: string;
+  // 등
+  { name: "데드리프트", category: "등", isOneArm: false },
+  { name: "렛풀다운", category: "등", isOneArm: false },
+  { name: "원암 렛풀다운", category: "등", isOneArm: true },
+  { name: "바벨로우", category: "등", isOneArm: false },
+  { name: "원암 덤벨로우", category: "등", isOneArm: true },
+  { name: "시티드 케이블로우", category: "등", isOneArm: false },
+  { name: "원암 케이블로우", category: "등", isOneArm: true },
+  { name: "풀업", category: "등", isOneArm: false },
+
+  // 어깨
+  { name: "오버헤드 프레스", category: "어깨", isOneArm: false },
+  { name: "덤벨 숄더 프레스", category: "어깨", isOneArm: false },
+  { name: "원암 덤벨 숄더 프레스", category: "어깨", isOneArm: true },
+  { name: "사이드 레이터럴 레이즈", category: "어깨", isOneArm: false },
+  { name: "원암 사이드 레이터럴 레이즈", category: "어깨", isOneArm: true },
+  { name: "페이스 풀", category: "어깨", isOneArm: false },
+  { name: "리버스 펙덱 플라이", category: "어깨", isOneArm: false },
+
+  // 하체
+  { name: "스쿼트", category: "하체", isOneArm: false },
+  { name: "레그 프레스", category: "하체", isOneArm: false },
+  { name: "원암/원레그 레그 익스텐션", category: "하체", isOneArm: true },
+  { name: "레그 컬", category: "하체", isOneArm: false },
+  { name: "런지", category: "하체", isOneArm: false },
+  { name: "바벨 힙 쓰러스트", category: "하체", isOneArm: false },
+
+  // 삼두
+  { name: "바벨 트라이셉스 익스텐션", category: "삼두", isOneArm: false },
+  { name: "원암 케이블 트라이셉스 익스텐션", category: "삼두", isOneArm: true },
+  { name: "케이블 푸쉬다운", category: "삼두", isOneArm: false },
+  { name: "원암 덤벨 오버헤드 익스텐션", category: "삼두", isOneArm: true },
+
+  // 이두
+  { name: "바벨 컬", category: "이두", isOneArm: false },
+  { name: "덤벨 컬", category: "이두", isOneArm: false },
+  { name: "원암 덤벨 프리처 컬", category: "이두", isOneArm: true },
+  { name: "원암 케이블 컬", category: "이두", isOneArm: true },
+  { name: "해머 컬", category: "이두", isOneArm: false },
+];
+
+interface SetItem {
+  setNumber: number;
   weight: number;
   reps: number;
-  restTime: number;
+  completed: boolean;
 }
 
-export default function Home() {
-  const [activeTab, setActiveTab] = useState<'log' | 'routine' | 'calendar'>('log');
-  
-  // 날짜 설정
-  const todayStr = new Date().toISOString().split('T')[0];
-  const [selectedDate, setSelectedDate] = useState<string>(todayStr);
+interface ExerciseItem {
+  name: string;
+  category: string;
+  isOneArm: boolean;
+  sets: SetItem[];
+}
 
-  // 분할 방식 및 분할별 등록된 종목 (Day1, Day2 ...)
-  const [splitCount, setSplitCount] = useState<number>(3);
-  const [splitRoutines, setSplitRoutines] = useState<Record<string, string[]>>({
-    'Day 1 (가슴/삼두)': ['바벨 벤치프레스 (프리)', '케이블 트라이셉스 푸시다운 (바)'],
-    'Day 2 (등/이두)': ['랫풀다운 (머신)', '바벨 컬 (프리)'],
-    'Day 3 (하체/어깨)': ['바벨 백 스쿼트 (프리)', '덤벨 숄더 프레스 (프리)'],
+interface RoutineItem {
+  id: string;
+  name: string;
+  targetDay: string;
+  exercises: { name: string; category: string; isOneArm: boolean; defaultSets: number }[];
+}
+
+export default function GymTracker() {
+  const [activeTab, setActiveTab] = useState<"log" | "routine" | "history">("log");
+  const [selectedDate, setSelectedDate] = useState<string>(
+    new Date().toISOString().split("T")[0]
+  );
+
+  // 저장된 루틴 목록
+  const [routines, setRoutines] = useState<RoutineItem[]>([
+    {
+      id: "1",
+      name: "가슴 & 삼두 루틴",
+      targetDay: "월요일",
+      exercises: [
+        { name: "벤치프레스", category: "가슴", isOneArm: false, defaultSets: 4 },
+        { name: "원암 케이블 체스트 플라이", category: "가슴", isOneArm: true, defaultSets: 3 },
+        { name: "원암 케이블 트라이셉스 익스텐션", category: "삼두", isOneArm: true, defaultSets: 3 },
+      ],
+    },
+    {
+      id: "2",
+      name: "등 & 이두 루틴",
+      targetDay: "화요일",
+      exercises: [
+        { name: "원암 덤벨로우", category: "등", isOneArm: true, defaultSets: 4 },
+        { name: "렛풀다운", category: "등", isOneArm: false, defaultSets: 4 },
+        { name: "원암 덤벨 프리처 컬", category: "이두", isOneArm: true, defaultSets: 3 },
+      ],
+    },
+  ]);
+
+  // 현재 진행/기록 중인 운동 세션
+  const [currentWorkout, setCurrentWorkout] = useState<{
+    title: string;
+    routineName?: string;
+    exercises: ExerciseItem[];
+  }>({
+    title: "오늘의 운동",
+    routineName: "",
+    exercises: [],
   });
 
-  const [currentDay, setCurrentDay] = useState<string>('Day 1 (가슴/삼두)');
+  // 완료되어 저장된 운동 기록 목록
+  const [workoutLogs, setWorkoutLogs] = useState<
+    { date: string; title: string; routineName?: string; exercises: ExerciseItem[] }[]
+  >([]);
 
-  // 루틴 설정 탭용 입력 상태
-  const [setupDay, setSetupDay] = useState<string>('Day 1 (가슴/삼두)');
-  const [setupCategory, setSetupCategory] = useState<string>('가슴');
-  const [setupExercise, setSetupExercise] = useState<string>(EXERCISE_LIST['가슴'][0]);
+  // 루틴 생성 폼 상태
+  const [newRoutineName, setNewRoutineName] = useState("");
+  const [newRoutineDay, setNewRoutineDay] = useState("월요일");
+  const [selectedExercisesForRoutine, setSelectedExercisesForRoutine] = useState<
+    { name: string; category: string; isOneArm: boolean; defaultSets: number }[]
+  >([]);
 
-  // 기록 입력 상태
-  const [category, setCategory] = useState<string>('가슴');
-  const [exercise, setExercise] = useState<string>(EXERCISE_LIST['가슴'][0]);
-  const [weight, setWeight] = useState(20);
-  const [reps, setReps] = useState(15);
-  const [restTime, setRestTime] = useState(45);
+  // 루틴을 기록으로 불러오는 핵심 함수
+  const loadRoutineToLog = (routine: RoutineItem) => {
+    const loadedExercises: ExerciseItem[] = routine.exercises.map((ex) => ({
+      name: ex.name,
+      category: ex.category,
+      isOneArm: ex.isOneArm,
+      sets: Array.from({ length: ex.defaultSets || 3 }, (_, index) => ({
+        setNumber: index + 1,
+        weight: 0,
+        reps: 10,
+        completed: false,
+      })),
+    }));
 
-  // 전체 기록
-  const [logs, setLogs] = useState<LogSet[]>([]);
+    setCurrentWorkout({
+      title: `${routine.name} (${selectedDate})`,
+      routineName: routine.name,
+      exercises: loadedExercises,
+    });
 
-  // 분할 수 변경 시 기본 Day 세팅 생성
-  const handleSplitCountChange = (count: number) => {
-    setSplitCount(count);
-    const newRoutines: Record<string, string[]> = {};
-    for (let i = 1; i <= count; i++) {
-      const dayKey = `Day ${i}`;
-      newRoutines[dayKey] = splitRoutines[dayKey] || [];
-    }
-    setSplitRoutines(newRoutines);
-    const firstKey = Object.keys(newRoutines)[0];
-    setCurrentDay(firstKey);
-    setSetupDay(firstKey);
+    setActiveTab("log");
+    alert(`'${routine.name}'을(를) 운동 기록으로 불러왔습니다!`);
   };
 
-  // 루틴에 종목 추가
-  const handleAddExerciseToRoutine = () => {
-    const currentList = splitRoutines[setupDay] || [];
-    if (!currentList.includes(setupExercise)) {
-      setSplitRoutines({
-        ...splitRoutines,
-        [setupDay]: [...currentList, setupExercise]
-      });
-    }
+  // 일반 운동 추가 함수
+  const addExerciseToCurrentWorkout = (exName: string) => {
+    const found = EXERCISE_DATABASE.find((e) => e.name === exName);
+    if (!found) return;
+
+    setCurrentWorkout((prev) => ({
+      ...prev,
+      exercises: [
+        ...prev.exercises,
+        {
+          name: found.name,
+          category: found.category,
+          isOneArm: found.isOneArm,
+          sets: [
+            { setNumber: 1, weight: 0, reps: 10, completed: false },
+            { setNumber: 2, weight: 0, reps: 10, completed: false },
+            { setNumber: 3, weight: 0, reps: 10, completed: false },
+          ],
+        },
+      ],
+    }));
   };
 
-  // 루틴에서 종목 삭제
-  const handleRemoveExerciseFromRoutine = (dayKey: string, exName: string) => {
-    setSplitRoutines({
-      ...splitRoutines,
-      [dayKey]: splitRoutines[dayKey].filter(e => e !== exName)
+  // 세트 추가 / 변경 / 완료
+  const updateSet = (
+    exIndex: number,
+    setIndex: number,
+    field: keyof SetItem,
+    val: number | boolean
+  ) => {
+    setCurrentWorkout((prev) => {
+      const updatedEx = [...prev.exercises];
+      const targetSets = [...updatedEx[exIndex].sets];
+      targetSets[setIndex] = { ...targetSets[setIndex], [field]: val };
+      updatedEx[exIndex].sets = targetSets;
+      return { ...prev, exercises: updatedEx };
     });
   };
 
-  // 부위 변경 처리
-  const handleCategoryChange = (newCategory: string, isSetup = false) => {
-    if (isSetup) {
-      setSetupCategory(newCategory);
-      setSetupExercise(EXERCISE_LIST[newCategory][0]);
-    } else {
-      setCategory(newCategory);
-      setExercise(EXERCISE_LIST[newCategory][0]);
+  const addSet = (exIndex: number) => {
+    setCurrentWorkout((prev) => {
+      const updatedEx = [...prev.exercises];
+      const currentSets = updatedEx[exIndex].sets;
+      const lastSet = currentSets[currentSets.length - 1] || { weight: 0, reps: 10 };
+      updatedEx[exIndex].sets = [
+        ...currentSets,
+        {
+          setNumber: currentSets.length + 1,
+          weight: lastSet.weight,
+          reps: lastSet.reps,
+          completed: false,
+        },
+      ];
+      return { ...prev, exercises: updatedEx };
+    });
+  };
+
+  // 운동 기록 저장 완료
+  const saveWorkoutLog = () => {
+    if (currentWorkout.exercises.length === 0) {
+      alert("추가된 운동이 없습니다. 운동을 추가한 후 저장해 주세요.");
+      return;
     }
-  };
 
-  // 세트 추가
-  const handleAddSet = () => {
-    const newSet: LogSet = {
-      id: Date.now().toString(),
+    const newLog = {
       date: selectedDate,
-      splitDay: currentDay,
-      category,
-      exercise,
-      weight,
-      reps,
-      restTime
+      title: currentWorkout.title,
+      routineName: currentWorkout.routineName,
+      exercises: currentWorkout.exercises,
     };
-    setLogs([...logs, newSet]);
+
+    setWorkoutLogs([newLog, ...workoutLogs]);
+    alert("운동 기록이 정상적으로 저장되었습니다!");
+
+    // 초기화
+    setCurrentWorkout({
+      title: "오늘의 운동",
+      routineName: "",
+      exercises: [],
+    });
   };
 
-  const handleDeleteSet = (id: string) => {
-    setLogs(logs.filter(log => log.id !== id));
-  };
+  // 새 루틴 만들기
+  const saveNewRoutine = () => {
+    if (!newRoutineName) {
+      alert("루틴 이름을 입력해주세요.");
+      return;
+    }
+    if (selectedExercisesForRoutine.length === 0) {
+      alert("최소 1개 이상의 운동을 선택해주세요.");
+      return;
+    }
 
-  const currentDayLogs = logs.filter(log => log.date === selectedDate);
-  const loggedDates = Array.from(new Set(logs.map(log => log.date)));
+    const created: RoutineItem = {
+      id: Date.now().toString(),
+      name: newRoutineName,
+      targetDay: newRoutineDay,
+      exercises: selectedExercisesForRoutine,
+    };
+
+    setRoutines([...routines, created]);
+    setNewRoutineName("");
+    setSelectedExercisesForRoutine([]);
+    alert("새 루틴이 저장되었습니다!");
+  };
 
   return (
-    <main className="max-w-md mx-auto p-4 min-h-screen bg-slate-50 text-slate-900 pb-12">
-      {/* 로고 헤더 */}
-      <div className="flex items-center justify-center gap-2 mb-6 pt-2">
-        <div className="w-9 h-9 rounded-xl bg-blue-600 flex items-center justify-center shadow-md shadow-blue-200">
-          <svg 
-            className="w-5 h-5 text-white" 
-            fill="none" 
-            stroke="currentColor" 
-            strokeWidth="2.5" 
-            viewBox="0 0 24 24" 
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path 
-              strokeLinecap="round" 
-              strokeLinejoin="round" 
-              d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" 
-            />
-          </svg>
+    <div className="min-h-screen bg-slate-950 text-slate-100 p-4 max-w-2xl mx-auto">
+      {/* 헤더 */}
+      <header className="flex justify-between items-center mb-6 pb-4 border-b border-slate-800">
+        <div>
+          <h1 className="text-2xl font-bold text-blue-500 flex items-center gap-2">
+            ⚡ GYM TRACKER
+          </h1>
+          <p className="text-xs text-slate-400">원암 & 분할 루틴 완전 연동 관리</p>
         </div>
-        <span className="text-xl font-extrabold tracking-tight text-slate-900">
-          GYM <span className="text-blue-600">TRACKER</span>
-        </span>
-      </div>
+        <input
+          type="date"
+          value={selectedDate}
+          onChange={(e) => setSelectedDate(e.target.value)}
+          className="bg-slate-900 border border-slate-700 text-slate-200 text-sm rounded px-3 py-1.5"
+        />
+      </header>
 
-      {/* 탭 네비게이션 */}
-      <div className="flex bg-slate-200 p-1 rounded-xl mb-4 text-xs font-semibold">
+      {/* 네비게이션 탭 */}
+      <nav className="flex bg-slate-900 rounded-lg p-1 mb-6 border border-slate-800">
         <button
-          onClick={() => setActiveTab('log')}
-          className={`flex-1 py-2 rounded-lg transition ${activeTab === 'log' ? 'bg-white shadow-sm text-blue-600 font-bold' : 'text-slate-600'}`}
+          onClick={() => setActiveTab("log")}
+          className={`flex-1 py-2 text-sm font-semibold rounded-md transition-all ${
+            activeTab === "log" ? "bg-blue-600 text-white" : "text-slate-400 hover:text-slate-200"
+          }`}
         >
-          📝 운동 기록
+          🏋️ 운동 기록
         </button>
         <button
-          onClick={() => setActiveTab('routine')}
-          className={`flex-1 py-2 rounded-lg transition ${activeTab === 'routine' ? 'bg-white shadow-sm text-blue-600 font-bold' : 'text-slate-600'}`}
+          onClick={() => setActiveTab("routine")}
+          className={`flex-1 py-2 text-sm font-semibold rounded-md transition-all ${
+            activeTab === "routine" ? "bg-blue-600 text-white" : "text-slate-400 hover:text-slate-200"
+          }`}
         >
-          ⚙️ 분할/종목 설정
+          📋 루틴 관리
         </button>
         <button
-          onClick={() => setActiveTab('calendar')}
-          className={`flex-1 py-2 rounded-lg transition ${activeTab === 'calendar' ? 'bg-white shadow-sm text-blue-600 font-bold' : 'text-slate-600'}`}
+          onClick={() => setActiveTab("history")}
+          className={`flex-1 py-2 text-sm font-semibold rounded-md transition-all ${
+            activeTab === "history" ? "bg-blue-600 text-white" : "text-slate-400 hover:text-slate-200"
+          }`}
         >
-          📅 달력 보기
+          📅 기록 보관함 ({workoutLogs.length})
         </button>
-      </div>
+      </nav>
 
-      {activeTab === 'log' && (
-        <>
-          {/* 날짜 & 분할 선택 */}
-          <div className="bg-white p-4 rounded-xl shadow-sm mb-4 space-y-3">
-            <div className="flex gap-2">
-              <div className="flex-1">
-                <label className="text-xs font-semibold text-gray-500">운동 날짜</label>
-                <input
-                  type="date"
-                  value={selectedDate}
-                  onChange={(e) => setSelectedDate(e.target.value)}
-                  className="w-full mt-1 p-2 border rounded-lg bg-gray-50 text-sm font-bold"
-                />
-              </div>
-              <div className="flex-1">
-                <label className="text-xs font-semibold text-gray-500">오늘 할 분할 Day</label>
-                <select 
-                  value={currentDay} 
-                  onChange={(e) => setCurrentDay(e.target.value)}
-                  className="w-full mt-1 p-2 border rounded-lg bg-gray-50 text-sm font-bold text-blue-600"
-                >
-                  {Object.keys(splitRoutines).map(day => (
-                    <option key={day} value={day}>{day}</option>
-                  ))}
-                </select>
-              </div>
-            </div>
-
-            {/* 현재 선택된 Day에 설정된 종목 퀵 선택 */}
-            {splitRoutines[currentDay]?.length > 0 && (
-              <div className="pt-1">
-                <label className="text-[11px] text-gray-400 block mb-1">💡 {currentDay} 지정 종목 (클릭 시 자동 선택)</label>
-                <div className="flex flex-wrap gap-1">
-                  {splitRoutines[currentDay].map(ex => (
-                    <button
-                      key={ex}
-                      onClick={() => setExercise(ex)}
-                      className={`text-xs px-2.5 py-1 rounded-md font-medium border ${exercise === ex ? 'bg-blue-600 text-white border-blue-600' : 'bg-slate-50 text-slate-700 border-slate-200'}`}
-                    >
-                      {ex}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* 세트 입력 폼 */}
-          <div className="bg-white p-4 rounded-xl shadow-sm mb-4 space-y-3">
-            <div>
-              <label className="text-xs text-gray-500 font-semibold">타겟 부위</label>
-              <select 
-                value={category} 
-                onChange={(e) => handleCategoryChange(e.target.value)}
-                className="w-full mt-1 p-2 border rounded-lg text-sm bg-slate-50"
-              >
-                {Object.keys(EXERCISE_LIST).map((cat) => (
-                  <option key={cat} value={cat}>{cat}</option>
-                ))}
-              </select>
-            </div>
-
-            <div>
-              <label className="text-xs text-gray-500 font-semibold">종목 선택</label>
-              <select 
-                value={exercise} 
-                onChange={(e) => setExercise(e.target.value)}
-                className="w-full mt-1 p-2 border rounded-lg text-sm font-bold text-slate-800"
-              >
-                {EXERCISE_LIST[category]?.map((ex) => (
-                  <option key={ex} value={ex}>{ex}</option>
-                ))}
-              </select>
-            </div>
-
-            <div className="grid grid-cols-3 gap-2 pt-2">
-              <div>
-                <label className="text-xs text-gray-500 block text-center">무게 (kg)</label>
-                <input 
-                  type="number" 
-                  value={weight} 
-                  onChange={(e) => setWeight(Number(e.target.value))}
-                  className="w-full mt-1 p-2 border rounded-lg text-center font-bold text-base"
-                />
-              </div>
-              <div>
-                <label className="text-xs text-gray-500 block text-center">횟수 (회)</label>
-                <input 
-                  type="number" 
-                  value={reps} 
-                  onChange={(e) => setReps(Number(e.target.value))}
-                  className="w-full mt-1 p-2 border rounded-lg text-center font-bold text-base"
-                />
-              </div>
-              <div>
-                <label className="text-xs text-gray-500 block text-center">휴식 (초)</label>
-                <input 
-                  type="number" 
-                  value={restTime} 
-                  onChange={(e) => setRestTime(Number(e.target.value))}
-                  className="w-full mt-1 p-2 border rounded-lg text-center font-bold text-base"
-                />
-              </div>
-            </div>
-
-            <button 
-              onClick={handleAddSet}
-              className="w-full py-3 bg-blue-600 text-white font-bold rounded-lg active:bg-blue-700 transition mt-2"
-            >
-              세트 추가하기
-            </button>
-          </div>
-
-          {/* 당일 기록 */}
-          <div className="bg-white p-4 rounded-xl shadow-sm">
-            <h2 className="font-bold text-sm mb-3">
-              📌 {selectedDate} 기록 ({currentDayLogs.length}세트)
-            </h2>
-            {currentDayLogs.length === 0 ? (
-              <p className="text-xs text-gray-400 text-center py-6">선택한 날짜에 기록된 운동이 없습니다.</p>
-            ) : (
-              <ul className="space-y-2">
-                {currentDayLogs.map((log) => (
-                  <li key={log.id} className="flex justify-between items-center text-xs p-2.5 bg-slate-100 rounded-lg">
-                    <div>
-                      <span className="text-[10px] text-blue-600 font-bold block">{log.splitDay} • {log.category}</span>
-                      <span className="font-bold text-gray-800">{log.exercise}</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-gray-600 font-medium">
-                        {log.weight}kg × {log.reps}회 <span className="text-gray-400">({log.restTime}초)</span>
-                      </span>
-                      <button 
-                        onClick={() => handleDeleteSet(log.id)}
-                        className="text-red-400 hover:text-red-600 text-xs px-1"
-                      >
-                        ✕
-                      </button>
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
-        </>
-      )}
-
-      {activeTab === 'routine' && (
-        <div className="space-y-4">
-          {/* 분할 설정 */}
-          <div className="bg-white p-4 rounded-xl shadow-sm space-y-3">
-            <h2 className="font-bold text-sm">1. 몇 분할로 진행할까요?</h2>
-            <div className="flex gap-2">
-              {[2, 3, 4, 5].map(num => (
+      {/* TAB 1: 운동 기록 */}
+      {activeTab === "log" && (
+        <section className="space-y-6">
+          {/* 빠른 루틴 불러오기 배너 */}
+          <div className="bg-slate-900/80 p-4 rounded-xl border border-slate-800">
+            <h3 className="text-xs font-semibold text-slate-400 mb-2">⚡ 생성한 루틴 불러오기</h3>
+            <div className="flex gap-2 overflow-x-auto pb-1">
+              {routines.map((r) => (
                 <button
-                  key={num}
-                  onClick={() => handleSplitCountChange(num)}
-                  className={`flex-1 py-2 rounded-lg font-bold text-sm ${splitCount === num ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-700'}`}
+                  key={r.id}
+                  onClick={() => loadRoutineToLog(r)}
+                  className="bg-slate-800 hover:bg-blue-900/50 border border-slate-700 hover:border-blue-500 text-xs px-3 py-2 rounded-lg text-left whitespace-nowrap transition-all shrink-0"
                 >
-                  {num}분할
+                  <div className="font-semibold text-slate-200">{r.name}</div>
+                  <div className="text-[10px] text-slate-400">{r.exercises.length}개 운동 포함</div>
                 </button>
               ))}
             </div>
           </div>
 
-          {/* 분할 Day별 종목 구성 */}
-          <div className="bg-white p-4 rounded-xl shadow-sm space-y-3">
-            <h2 className="font-bold text-sm">2. 분할별 종목 구성하기</h2>
-            
-            <div>
-              <label className="text-xs text-gray-500 font-semibold">설정할 Day</label>
+          {/* 운동 선택 라이브러리 */}
+          <div className="bg-slate-900 p-4 rounded-xl border border-slate-800 space-y-3">
+            <h3 className="text-sm font-semibold text-slate-300">➕ 운동 종목 추가 (원암 & 일반)</h3>
+            <div className="flex gap-2 overflow-x-auto pb-2">
               <select
-                value={setupDay}
-                onChange={(e) => setSetupDay(e.target.value)}
-                className="w-full mt-1 p-2 border rounded-lg bg-gray-50 text-sm font-bold"
+                onChange={(e) => {
+                  if (e.target.value) {
+                    addExerciseToCurrentWorkout(e.target.value);
+                    e.target.value = "";
+                  }
+                }}
+                className="w-full bg-slate-800 border border-slate-700 text-sm text-slate-200 rounded-lg p-2.5"
               >
-                {Object.keys(splitRoutines).map(day => (
+                <option value="">-- 운동 종목을 선택하세요 --</option>
+                {EXERCISE_DATABASE.map((ex, idx) => (
+                  <option key={idx} value={ex.name}>
+                    [{ex.category}] {ex.name} {ex.isOneArm ? "(원암 🦾)" : ""}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          {/* 현재 기록 중인 운동 목록 */}
+          <div className="space-y-4">
+            {currentWorkout.exercises.length === 0 ? (
+              <div className="text-center py-12 text-slate-500 bg-slate-900/40 rounded-xl border border-dashed border-slate-800">
+                상단의 [루틴 불러오기] 또는 [운동 종목 추가]를 눌러 기록을 시작하세요.
+              </div>
+            ) : (
+              currentWorkout.exercises.map((ex, exIdx) => (
+                <div key={exIdx} className="bg-slate-900 p-4 rounded-xl border border-slate-800 space-y-3">
+                  <div className="flex justify-between items-center">
+                    <div className="flex items-center gap-2">
+                      <span className="bg-blue-900/60 text-blue-300 text-xs font-bold px-2 py-0.5 rounded">
+                        {ex.category}
+                      </span>
+                      <h4 className="font-bold text-slate-100">{ex.name}</h4>
+                      {ex.isOneArm && (
+                        <span className="bg-amber-900/40 text-amber-300 text-[10px] px-1.5 py-0.5 rounded border border-amber-700/50">
+                          원암 (One-Arm)
+                        </span>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* 세트 헤더 및 리스트 */}
+                  <div className="space-y-2">
+                    <div className="grid grid-cols-12 text-xs text-slate-400 text-center px-1">
+                      <span className="col-span-2">세트</span>
+                      <span className="col-span-4">kg</span>
+                      <span className="col-span-4">회</span>
+                      <span className="col-span-2">완료</span>
+                    </div>
+
+                    {ex.sets.map((s, setIdx) => (
+                      <div key={setIdx} className="grid grid-cols-12 gap-2 items-center">
+                        <span className="col-span-2 text-center text-xs text-slate-400 font-bold">
+                          {s.setNumber}
+                        </span>
+                        <input
+                          type="number"
+                          value={s.weight}
+                          onChange={(e) => updateSet(exIdx, setIdx, "weight", Number(e.target.value))}
+                          className="col-span-4 bg-slate-800 text-center text-sm rounded border border-slate-700 p-1 text-slate-100"
+                        />
+                        <input
+                          type="number"
+                          value={s.reps}
+                          onChange={(e) => updateSet(exIdx, setIdx, "reps", Number(e.target.value))}
+                          className="col-span-4 bg-slate-800 text-center text-sm rounded border border-slate-700 p-1 text-slate-100"
+                        />
+                        <button
+                          onClick={() => updateSet(exIdx, setIdx, "completed", !s.completed)}
+                          className={`col-span-2 py-1 rounded text-xs font-bold transition-all ${
+                            s.completed ? "bg-emerald-600 text-white" : "bg-slate-800 text-slate-400"
+                          }`}
+                        >
+                          {s.completed ? "✓" : "-"}
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+
+                  <button
+                    onClick={() => addSet(exIdx)}
+                    className="w-full mt-2 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold rounded border border-slate-700"
+                  >
+                    + 세트 추가
+                  </button>
+                </div>
+              ))
+            )}
+          </div>
+
+          {currentWorkout.exercises.length > 0 && (
+            <button
+              onClick={saveWorkoutLog}
+              className="w-full py-3 bg-emerald-600 hover:bg-emerald-500 font-bold text-white rounded-xl shadow-lg transition-all"
+            >
+              💾 오늘 운동 완료 및 기록 저장
+            </button>
+          )}
+        </section>
+      )}
+
+      {/* TAB 2: 루틴 생성 및 관리 */}
+      {activeTab === "routine" && (
+        <section className="space-y-6">
+          {/* 새 루틴 제작 */}
+          <div className="bg-slate-900 p-4 rounded-xl border border-slate-800 space-y-4">
+            <h3 className="text-base font-bold text-slate-200">🛠️ 나만의 분할 루틴 만들기</h3>
+
+            <div className="grid grid-cols-3 gap-2">
+              <input
+                type="text"
+                placeholder="루틴 이름 (예: 등/이두 파괴)"
+                value={newRoutineName}
+                onChange={(e) => setNewRoutineName(e.target.value)}
+                className="col-span-2 bg-slate-800 border border-slate-700 rounded-lg p-2 text-sm text-slate-100"
+              />
+              <select
+                value={newRoutineDay}
+                onChange={(e) => setNewRoutineDay(e.target.value)}
+                className="col-span-1 bg-slate-800 border border-slate-700 rounded-lg p-2 text-sm text-slate-100"
+              >
+                {["월요일", "화요일", "수요일", "목요일", "금요일", "토요일", "일요일"].map((day) => (
                   <option key={day} value={day}>{day}</option>
                 ))}
               </select>
             </div>
 
-            <div className="grid grid-cols-2 gap-2">
-              <div>
-                <label className="text-xs text-gray-500 font-semibold">부위</label>
-                <select
-                  value={setupCategory}
-                  onChange={(e) => handleCategoryChange(e.target.value, true)}
-                  className="w-full mt-1 p-2 border rounded-lg text-xs"
-                >
-                  {Object.keys(EXERCISE_LIST).map(cat => (
-                    <option key={cat} value={cat}>{cat}</option>
-                  ))}
-                </select>
-              </div>
-              <div>
-                <label className="text-xs text-gray-500 font-semibold">종목 선택</label>
-                <select
-                  value={setupExercise}
-                  onChange={(e) => setSetupExercise(e.target.value)}
-                  className="w-full mt-1 p-2 border rounded-lg text-xs font-semibold"
-                >
-                  {EXERCISE_LIST[setupCategory]?.map(ex => (
-                    <option key={ex} value={ex}>{ex}</option>
-                  ))}
-                </select>
-              </div>
+            {/* 루틴용 종목 선택 */}
+            <div className="space-y-2">
+              <label className="text-xs text-slate-400">포함할 운동 추가:</label>
+              <select
+                onChange={(e) => {
+                  if (!e.target.value) return;
+                  const item = EXERCISE_DATABASE.find((ex) => ex.name === e.target.value);
+                  if (item) {
+                    setSelectedExercisesForRoutine((prev) => [
+                      ...prev,
+                      { name: item.name, category: item.category, isOneArm: item.isOneArm, defaultSets: 3 },
+                    ]);
+                  }
+                  e.target.value = "";
+                }}
+                className="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-sm text-slate-100"
+              >
+                <option value="">-- 클릭하여 운동 추가 --</option>
+                {EXERCISE_DATABASE.map((ex, idx) => (
+                  <option key={idx} value={ex.name}>
+                    [{ex.category}] {ex.name} {ex.isOneArm ? "(원암 🦾)" : ""}
+                  </option>
+                ))}
+              </select>
             </div>
 
+            {/* 선택된 운동 목록 */}
+            {selectedExercisesForRoutine.length > 0 && (
+              <div className="space-y-2">
+                {selectedExercisesForRoutine.map((item, idx) => (
+                  <div key={idx} className="flex justify-between items-center bg-slate-800 p-2.5 rounded-lg text-sm">
+                    <span>
+                      [{item.category}] <strong>{item.name}</strong> {item.isOneArm && "(원암)"}
+                    </span>
+                    <button
+                      onClick={() =>
+                        setSelectedExercisesForRoutine(selectedExercisesForRoutine.filter((_, i) => i !== idx))
+                      }
+                      className="text-red-400 text-xs px-2 py-1 hover:bg-slate-700 rounded"
+                    >
+                      삭제
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+
             <button
-              onClick={handleAddExerciseToRoutine}
-              className="w-full py-2 bg-slate-800 text-white text-xs font-bold rounded-lg"
+              onClick={saveNewRoutine}
+              className="w-full py-2.5 bg-blue-600 hover:bg-blue-500 font-bold rounded-lg text-sm transition-all"
             >
-              + {setupDay}에 종목 추가
+              저장하기
             </button>
           </div>
 
-          {/* 현재 구성된 분할별 루틴 확인 */}
-          <div className="bg-white p-4 rounded-xl shadow-sm space-y-3">
-            <h2 className="font-bold text-sm">내 분할 루틴 목록</h2>
-            {Object.keys(splitRoutines).map(day => (
-              <div key={day} className="border p-3 rounded-lg bg-slate-50">
-                <span className="font-bold text-xs text-blue-600 block mb-2">{day}</span>
-                {splitRoutines[day]?.length === 0 ? (
-                  <p className="text-[11px] text-gray-400">지정된 종목이 없습니다.</p>
-                ) : (
-                  <div className="flex flex-wrap gap-1.5">
-                    {splitRoutines[day].map(ex => (
-                      <span key={ex} className="text-xs bg-white border px-2 py-1 rounded-md flex items-center gap-1 font-medium">
-                        {ex}
-                        <button
-                          onClick={() => handleRemoveExerciseFromRoutine(day, ex)}
-                          className="text-red-400 text-xs ml-1"
-                        >
-                          ✕
-                        </button>
-                      </span>
-                    ))}
+          {/* 루틴 목록 및 불러오기 버튼 */}
+          <div className="space-y-3">
+            <h3 className="text-sm font-semibold text-slate-400">내 루틴 목록 ({routines.length})</h3>
+            {routines.map((r) => (
+              <div key={r.id} className="bg-slate-900 p-4 rounded-xl border border-slate-800 space-y-3">
+                <div className="flex justify-between items-center">
+                  <div>
+                    <span className="text-xs bg-slate-800 text-blue-400 px-2 py-0.5 rounded font-semibold mr-2">
+                      {r.targetDay}
+                    </span>
+                    <strong className="text-slate-100">{r.name}</strong>
                   </div>
-                )}
+                  <button
+                    onClick={() => loadRoutineToLog(r)}
+                    className="bg-blue-600 hover:bg-blue-500 text-white text-xs px-3 py-1.5 rounded-lg font-bold"
+                  >
+                    기록으로 불러오기 ➔
+                  </button>
+                </div>
+                <div className="text-xs text-slate-400 flex flex-wrap gap-1">
+                  {r.exercises.map((ex, idx) => (
+                    <span key={idx} className="bg-slate-800 px-2 py-1 rounded text-slate-300">
+                      {ex.name} {ex.isOneArm && "🦾"}
+                    </span>
+                  ))}
+                </div>
               </div>
             ))}
           </div>
-        </div>
+        </section>
       )}
 
-      {activeTab === 'calendar' && (
-        <div className="space-y-4">
-          <div className="bg-white p-4 rounded-xl shadow-sm">
-            <h2 className="font-bold text-sm mb-3">📅 날짜 선택</h2>
-            <input
-              type="date"
-              value={selectedDate}
-              onChange={(e) => setSelectedDate(e.target.value)}
-              className="w-full p-2 border rounded-lg bg-gray-50 text-sm font-bold mb-3"
-            />
-            
-            <div className="text-xs text-gray-500 mb-2 font-semibold">
-              💡 운동한 날짜 목록:
+      {/* TAB 3: 기록 보관함 */}
+      {activeTab === "history" && (
+        <section className="space-y-4">
+          <h3 className="text-sm font-semibold text-slate-400">저장된 운동 기록</h3>
+          {workoutLogs.length === 0 ? (
+            <div className="text-center py-12 text-slate-500 bg-slate-900/40 rounded-xl border border-dashed border-slate-800">
+              저장된 운동 기록이 없습니다.
             </div>
-            {loggedDates.length === 0 ? (
-              <p className="text-xs text-gray-400 py-2">아직 기록이 없습니다.</p>
-            ) : (
-              <div className="flex flex-wrap gap-1.5">
-                {loggedDates.sort().map(d => (
-                  <button
-                    key={d}
-                    onClick={() => {
-                      setSelectedDate(d);
-                      setActiveTab('log');
-                    }}
-                    className={`text-xs px-2.5 py-1 rounded-full font-medium ${d === selectedDate ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-700'}`}
-                  >
-                    {d}
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
-
-          <div className="bg-white p-4 rounded-xl shadow-sm">
-            <h2 className="font-bold text-sm mb-3">📋 {selectedDate} 운동 상세</h2>
-            {currentDayLogs.length === 0 ? (
-              <p className="text-xs text-gray-400 py-4 text-center">해당 날짜의 기록이 없습니다.</p>
-            ) : (
-              <ul className="space-y-2">
-                {currentDayLogs.map((log) => (
-                  <li key={log.id} className="text-xs p-2.5 bg-slate-100 rounded-lg flex justify-between">
-                    <div>
-                      <span className="font-bold text-gray-800">{log.exercise}</span>
-                      <span className="text-[10px] text-gray-500 block">{log.splitDay} • {log.category}</span>
-                    </div>
-                    <span className="font-semibold text-slate-700">
-                      {log.weight}kg × {log.reps}회
+          ) : (
+            workoutLogs.map((log, idx) => (
+              <div key={idx} className="bg-slate-900 p-4 rounded-xl border border-slate-800 space-y-3">
+                <div className="flex justify-between items-center border-b border-slate-800 pb-2">
+                  <div>
+                    <span className="text-xs text-slate-400">{log.date}</span>
+                    <h4 className="font-bold text-slate-100">{log.title}</h4>
+                  </div>
+                  {log.routineName && (
+                    <span className="text-xs bg-emerald-900/50 text-emerald-300 px-2 py-0.5 rounded border border-emerald-800">
+                      {log.routineName}
                     </span>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
-        </div>
+                  )}
+                </div>
+                <div className="space-y-2">
+                  {log.exercises.map((ex, eIdx) => (
+                    <div key={eIdx} className="text-xs text-slate-300 bg-slate-800/50 p-2 rounded">
+                      <div className="font-semibold text-blue-400 mb-1">
+                        [{ex.category}] {ex.name} {ex.isOneArm && "(원암)"}
+                      </div>
+                      <div className="text-slate-400 flex flex-wrap gap-2">
+                        {ex.sets.map((s, sIdx) => (
+                          <span key={sIdx} className={s.completed ? "text-emerald-400 font-semibold" : ""}>
+                            {s.setNumber}세트: {s.weight}kg × {s.reps}회
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))
+          )}
+        </section>
       )}
-    </main>
+    </div>
   );
 }
