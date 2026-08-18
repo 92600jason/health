@@ -104,7 +104,7 @@ interface WeeklyRoutine {
 }
 
 interface WorkoutLog {
-  date: string; // YYYY-MM-DD
+  date: string;
   title: string;
   exercises: ExerciseItem[];
 }
@@ -120,7 +120,6 @@ export default function GymTracker() {
   const [editingRoutineId, setEditingRoutineId] = useState<string | null>(null);
   const [isLoaded, setIsLoaded] = useState(false);
 
-  // 달력 연/월 상태
   const [calendarYear, setCalendarYear] = useState(new Date().getFullYear());
   const [calendarMonth, setCalendarMonth] = useState(new Date().getMonth());
   const [viewingLogDate, setViewingLogDate] = useState<string | null>(null);
@@ -176,7 +175,6 @@ export default function GymTracker() {
     if (isLoaded) localStorage.setItem("gym_logs", JSON.stringify(workoutLogs));
   }, [workoutLogs, isLoaded]);
 
-  // 날짜가 변경될 때 기존 해당 날짜의 운동 기록 불러오기
   useEffect(() => {
     const existingLog = workoutLogs.find((l) => l.date === selectedDate);
     if (existingLog) {
@@ -234,6 +232,25 @@ export default function GymTracker() {
     setEditingSchedule((prev) => {
       const updatedExercises = [...prev[day].exercises];
       updatedExercises.splice(exIdx, 1);
+      return {
+        ...prev,
+        [day]: { ...prev[day], exercises: updatedExercises },
+      };
+    });
+  };
+
+  // 루틴 설정 내 종목 순서 변경 (위/아래)
+  const moveExerciseInScheduleDay = (day: string, fromIndex: number, direction: "up" | "down") => {
+    setEditingSchedule((prev) => {
+      const updatedExercises = [...prev[day].exercises];
+      const targetIndex = direction === "up" ? fromIndex - 1 : fromIndex + 1;
+
+      if (targetIndex < 0 || targetIndex >= updatedExercises.length) return prev;
+
+      const temp = updatedExercises[fromIndex];
+      updatedExercises[fromIndex] = updatedExercises[targetIndex];
+      updatedExercises[targetIndex] = temp;
+
       return {
         ...prev,
         [day]: { ...prev[day], exercises: updatedExercises },
@@ -343,6 +360,22 @@ export default function GymTracker() {
     });
   };
 
+  // 운동 기록 진행 중 종목 순서 변경 (위/아래)
+  const moveExerciseInWorkout = (fromIndex: number, direction: "up" | "down") => {
+    setCurrentWorkout((prev) => {
+      const updated = [...prev.exercises];
+      const targetIndex = direction === "up" ? fromIndex - 1 : fromIndex + 1;
+
+      if (targetIndex < 0 || targetIndex >= updated.length) return prev;
+
+      const temp = updated[fromIndex];
+      updated[fromIndex] = updated[targetIndex];
+      updated[targetIndex] = temp;
+
+      return { ...prev, exercises: updated };
+    });
+  };
+
   const updateSet = (exIdx: number, setIdx: number, field: keyof SetItem, val: string | boolean) => {
     setCurrentWorkout((prev) => {
       const updated = [...prev.exercises];
@@ -398,7 +431,6 @@ export default function GymTracker() {
     });
   };
 
-  // 동일한 날짜 중복 저장 방지 -> 덮어쓰기 로직 적용
   const saveWorkoutLog = () => {
     if (currentWorkout.exercises.length === 0) {
       alert("기록할 운동 종목이 없습니다.");
@@ -439,19 +471,16 @@ export default function GymTracker() {
     return ex.category === selectedCategoryTab;
   });
 
-  // 달력 생성을 위한 헬퍼 함수
   const renderCalendar = () => {
     const firstDayOfMonth = new Date(calendarYear, calendarMonth, 1).getDay();
     const daysInMonth = new Date(calendarYear, calendarMonth + 1, 0).getDate();
 
     const calendarCells = [];
 
-    // 빈 칸 (첫 주 시작 요일 전)
     for (let i = 0; i < firstDayOfMonth; i++) {
       calendarCells.push(<div key={`empty-${i}`} className="h-20 bg-slate-900/20 rounded-lg"></div>);
     }
 
-    // 날짜 칸
     for (let day = 1; day <= daysInMonth; day++) {
       const monthStr = String(calendarMonth + 1).padStart(2, "0");
       const dayStr = String(day).padStart(2, "0");
@@ -459,7 +488,6 @@ export default function GymTracker() {
 
       const logForDay = workoutLogs.find((l) => l.date === dateKey);
 
-      // 해당 날짜 수행 부위 추출 (중복 제거)
       const categoriesDone = logForDay
         ? Array.from(new Set(logForDay.exercises.map((e) => e.category)))
         : [];
@@ -509,7 +537,7 @@ export default function GymTracker() {
       <header className="flex justify-between items-center mb-6 pb-4 border-b border-slate-800">
         <div>
           <h1 className="text-2xl font-bold text-blue-500">⚡ GYM TRACKER</h1>
-          <p className="text-xs text-slate-400">날짜별 세트 기록 및 운동 달력</p>
+          <p className="text-xs text-slate-400">날짜별 세트 기록 및 순서 편집 지원</p>
         </div>
         <input
           type="date"
@@ -619,6 +647,26 @@ export default function GymTracker() {
                 <div key={exIdx} className="bg-slate-900 p-4 rounded-xl border border-slate-800 space-y-3">
                   <div className="flex justify-between items-center">
                     <div className="flex items-center gap-2">
+                      {/* 종목 순서 변경 버튼 (▲ / ▼) */}
+                      <div className="flex flex-col gap-0.5">
+                        <button
+                          disabled={exIdx === 0}
+                          onClick={() => moveExerciseInWorkout(exIdx, "up")}
+                          className="text-[10px] bg-slate-800 hover:bg-slate-700 disabled:opacity-30 text-slate-300 px-1.5 py-0.5 rounded font-bold"
+                          title="위로 이동"
+                        >
+                          ▲
+                        </button>
+                        <button
+                          disabled={exIdx === currentWorkout.exercises.length - 1}
+                          onClick={() => moveExerciseInWorkout(exIdx, "down")}
+                          className="text-[10px] bg-slate-800 hover:bg-slate-700 disabled:opacity-30 text-slate-300 px-1.5 py-0.5 rounded font-bold"
+                          title="아래로 이동"
+                        >
+                          ▼
+                        </button>
+                      </div>
+
                       <span className="bg-blue-900/60 text-blue-300 text-xs font-bold px-2 py-0.5 rounded">
                         {ex.category}
                       </span>
@@ -767,7 +815,22 @@ export default function GymTracker() {
                                 key={eIdx}
                                 className="bg-slate-900 text-xs text-blue-300 px-2 py-0.5 rounded border border-slate-700 flex items-center gap-1"
                               >
+                                {/* 요일 루틴 내 순서 조정 버튼 */}
+                                <button
+                                  disabled={eIdx === 0}
+                                  onClick={() => moveExerciseInScheduleDay(day, eIdx, "up")}
+                                  className="text-[9px] text-slate-400 hover:text-slate-200 disabled:opacity-30"
+                                >
+                                  ◀
+                                </button>
                                 {ex.name}
+                                <button
+                                  disabled={eIdx === dayConfig.exercises.length - 1}
+                                  onClick={() => moveExerciseInScheduleDay(day, eIdx, "down")}
+                                  className="text-[9px] text-slate-400 hover:text-slate-200 disabled:opacity-30"
+                                >
+                                  ▶
+                                </button>
                                 <button
                                   onClick={() => removeExerciseFromScheduleDay(day, eIdx)}
                                   className="text-red-400 font-bold ml-1 text-[10px]"
@@ -869,7 +932,6 @@ export default function GymTracker() {
             <div className="grid grid-cols-7 gap-1">{renderCalendar()}</div>
           </div>
 
-          {/* 달력에서 클릭한 날짜의 상세 기록 카드 */}
           {viewingLogDate && (
             <div className="bg-slate-900 p-4 rounded-xl border border-blue-500/50 space-y-3">
               <div className="flex justify-between items-center border-b border-slate-800 pb-2">
