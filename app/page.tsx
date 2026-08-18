@@ -17,14 +17,12 @@ const EXERCISE_DATABASE = [
   { name: "딥스", category: "가슴", isOneArm: false },
 
   // ================= 등 (풀다운 강화 & 로우 보존) =================
-  // 풀다운 계열
   { name: "렛풀다운 (오버그립)", category: "등", isOneArm: false },
   { name: "렛풀다운 (언더그립)", category: "등", isOneArm: false },
   { name: "클로즈그립 렛풀다운", category: "등", isOneArm: false },
   { name: "원암 케이블 렛풀다운", category: "등", isOneArm: true },
   { name: "케이블 암 풀다운 (스트레이트 바)", category: "등", isOneArm: false },
   { name: "풀업 (턱걸이)", category: "등", isOneArm: false },
-  // 로우 계열
   { name: "바벨로우", category: "등", isOneArm: false },
   { name: "스미스 머신 바벨로우", category: "등", isOneArm: false },
   { name: "덤벨로우", category: "등", isOneArm: false },
@@ -34,24 +32,20 @@ const EXERCISE_DATABASE = [
   { name: "컨벤셔널 데드리프트", category: "등", isOneArm: false },
 
   // ================= 어깨 (전면 / 측면 / 후면 & 바벨/덤벨/스미스 구분) =================
-  // 전면 어깨
   { name: "[전면] 바벨 오버헤드 프레스", category: "어깨", isOneArm: false },
   { name: "[전면] 덤벨 숄더 프레스", category: "어깨", isOneArm: false },
   { name: "[전면] 스미스 머신 숄더 프레스", category: "어깨", isOneArm: false },
   { name: "[전면] 덤벨 프론트 레이즈", category: "어깨", isOneArm: false },
   { name: "[전면] 케이블 프론트 레이즈", category: "어깨", isOneArm: false },
-  // 측면 어깨
   { name: "[측면] 덤벨 사이드 레이터럴 레이즈", category: "어깨", isOneArm: false },
   { name: "[측면] 원암 덤벨 사이드 레이터럴 레이즈", category: "어깨", isOneArm: true },
   { name: "[측면] 케이블 사이드 레이터럴 레이즈", category: "어깨", isOneArm: false },
   { name: "[측면] 원암 케이블 사이드 레이터럴 레이즈", category: "어깨", isOneArm: true },
-  // 후면 어깨
   { name: "[후면] 덤벨 리버스 플라이", category: "후면어깨", isOneArm: false },
   { name: "[후면] 케이블 리버스 펙덱 플라이", category: "후면어깨", isOneArm: false },
   { name: "[후면] 케이블 페이스풀", category: "후면어깨", isOneArm: false },
 
   // ================= 하체 (투레그 / 원레그 & 바벨/덤벨/스미스 구분) =================
-  // 투레그 (Two Leg)
   { name: "[투레그] 바벨 백스쿼트", category: "하체", isOneArm: false },
   { name: "[투레그] 바벨 프론트스쿼트", category: "하체", isOneArm: false },
   { name: "[투레그] 스미스 머신 스쿼트", category: "하체", isOneArm: false },
@@ -61,7 +55,6 @@ const EXERCISE_DATABASE = [
   { name: "[투레그] 레그 컬", category: "하체", isOneArm: false },
   { name: "[투레그] 바벨 루마니안 데드리프트", category: "하체", isOneArm: false },
   { name: "[투레그] 덤벨 루마니안 데드리프트", category: "하체", isOneArm: false },
-  // 원레그 (Single Leg)
   { name: "[원레그] 덤벨 런지", category: "하체", isOneArm: true },
   { name: "[원레그] 스미스 머신 런지", category: "하체", isOneArm: false },
   { name: "[원레그] 덤벨 불가지안 스플릿 스쿼트", category: "하체", isOneArm: true },
@@ -134,6 +127,8 @@ export default function GymTracker() {
     },
   ]);
 
+  const [editingRoutineId, setEditingRoutineId] = useState<string | null>(null);
+
   const [currentWorkout, setCurrentWorkout] = useState<{
     title: string;
     exercises: ExerciseItem[];
@@ -181,21 +176,71 @@ export default function GymTracker() {
     });
   };
 
+  const removeExerciseFromScheduleDay = (day: string, exIdx: number) => {
+    setEditingSchedule((prev) => {
+      const currentDay = prev[day];
+      const updatedExercises = [...currentDay.exercises];
+      updatedExercises.splice(exIdx, 1);
+      return {
+        ...prev,
+        [day]: {
+          ...currentDay,
+          exercises: updatedExercises,
+        },
+      };
+    });
+  };
+
+  const startEditRoutine = (routine: WeeklyRoutine) => {
+    setEditingRoutineId(routine.id);
+    setNewRoutineName(routine.name);
+    setEditingSchedule(JSON.parse(JSON.stringify(routine.schedule)));
+  };
+
+  const cancelEditRoutine = () => {
+    setEditingRoutineId(null);
+    setNewRoutineName("");
+    setEditingSchedule(
+      DAYS.reduce((acc, day) => {
+        acc[day] = { day, isRest: false, targetCategories: [], exercises: [] };
+        return acc;
+      }, {} as Record<string, DaySchedule>)
+    );
+  };
+
   const saveWeeklyRoutine = () => {
-    if (!newRoutineName) {
-      alert("루틴 이름을 입력해주세요");
+    if (!newRoutineName.trim()) {
+      alert("루틴 이름을 입력해주세요.");
       return;
     }
 
-    const created: WeeklyRoutine = {
-      id: Date.now().toString(),
-      name: newRoutineName,
-      schedule: editingSchedule,
-    };
+    if (editingRoutineId) {
+      setRoutines((prev) =>
+        prev.map((r) =>
+          r.id === editingRoutineId
+            ? { ...r, name: newRoutineName, schedule: editingSchedule }
+            : r
+        )
+      );
+      alert(`'${newRoutineName}' 루틴이 수정되었습니다!`);
+    } else {
+      const created: WeeklyRoutine = {
+        id: Date.now().toString(),
+        name: newRoutineName,
+        schedule: editingSchedule,
+      };
+      setRoutines([...routines, created]);
+      alert(`'${newRoutineName}' 루틴이 저장되었습니다!`);
+    }
 
-    setRoutines([...routines, created]);
-    setNewRoutineName("");
-    alert(`'${newRoutineName}' 루틴이 저장되었습니다!`);
+    cancelEditRoutine();
+  };
+
+  const deleteRoutine = (id: string) => {
+    if (confirm("해당 루틴을 삭제하시겠습니까?")) {
+      setRoutines((prev) => prev.filter((r) => r.id !== id));
+      if (editingRoutineId === id) cancelEditRoutine();
+    }
   };
 
   const loadRoutineToLog = (routine: WeeklyRoutine) => {
@@ -430,7 +475,19 @@ export default function GymTracker() {
       {activeTab === "routine" && (
         <section className="space-y-6">
           <div className="bg-slate-900 p-4 rounded-xl border border-slate-800 space-y-4">
-            <h3 className="text-base font-bold text-slate-200">🗓️ 주간(월~일) 분할 루틴 만들기</h3>
+            <div className="flex justify-between items-center">
+              <h3 className="text-base font-bold text-slate-200">
+                {editingRoutineId ? "✏️ 루틴 수정하기" : "🗓️ 새 주간 분할 루틴 만들기"}
+              </h3>
+              {editingRoutineId && (
+                <button
+                  onClick={cancelEditRoutine}
+                  className="text-xs text-slate-400 hover:text-slate-200 underline"
+                >
+                  취소 및 신규 작성
+                </button>
+              )}
+            </div>
 
             <input
               type="text"
@@ -479,8 +536,14 @@ export default function GymTracker() {
                         {dayConfig.exercises.length > 0 && (
                           <div className="flex flex-wrap gap-1">
                             {dayConfig.exercises.map((ex, eIdx) => (
-                              <span key={eIdx} className="bg-slate-900 text-xs text-blue-300 px-2 py-0.5 rounded border border-slate-700">
+                              <span key={eIdx} className="bg-slate-900 text-xs text-blue-300 px-2 py-0.5 rounded border border-slate-700 flex items-center gap-1">
                                 {ex.name}
+                                <button
+                                  onClick={() => removeExerciseFromScheduleDay(day, eIdx)}
+                                  className="text-red-400 hover:text-red-300 font-bold ml-1 text-[10px]"
+                                >
+                                  ✕
+                                </button>
                               </span>
                             ))}
                           </div>
@@ -494,9 +557,11 @@ export default function GymTracker() {
 
             <button
               onClick={saveWeeklyRoutine}
-              className="w-full py-3 bg-blue-600 hover:bg-blue-500 font-bold rounded-lg text-sm"
+              className={`w-full py-3 font-bold rounded-lg text-sm text-white ${
+                editingRoutineId ? "bg-emerald-600 hover:bg-emerald-500" : "bg-blue-600 hover:bg-blue-500"
+              }`}
             >
-              💾 주간 루틴 생성 완료
+              {editingRoutineId ? "💾 수정사항 저장 완료" : "💾 주간 루틴 생성 완료"}
             </button>
           </div>
 
@@ -506,12 +571,26 @@ export default function GymTracker() {
               <div key={r.id} className="bg-slate-900 p-4 rounded-xl border border-slate-800 space-y-3">
                 <div className="flex justify-between items-center border-b border-slate-800 pb-2">
                   <h4 className="font-bold text-slate-100">{r.name}</h4>
-                  <button
-                    onClick={() => loadRoutineToLog(r)}
-                    className="bg-blue-600 hover:bg-blue-500 text-white text-xs px-3 py-1.5 rounded-lg font-bold"
-                  >
-                    오늘 분할 기록에 가져오기 ➔
-                  </button>
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => startEditRoutine(r)}
+                      className="bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs px-2.5 py-1 rounded font-bold border border-slate-700"
+                    >
+                      ✏️ 수정
+                    </button>
+                    <button
+                      onClick={() => deleteRoutine(r.id)}
+                      className="bg-red-950/60 hover:bg-red-900/80 text-red-300 text-xs px-2.5 py-1 rounded font-bold border border-red-800"
+                    >
+                      🗑️ 삭제
+                    </button>
+                    <button
+                      onClick={() => loadRoutineToLog(r)}
+                      className="bg-blue-600 hover:bg-blue-500 text-white text-xs px-3 py-1 rounded-lg font-bold"
+                    >
+                      기록에 적용 ➔
+                    </button>
+                  </div>
                 </div>
                 <div className="grid grid-cols-7 gap-1 text-[11px] text-center">
                   {DAYS.map((day) => {
