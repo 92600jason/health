@@ -2,62 +2,156 @@
 
 import React, { useState, useEffect } from "react";
 
-// 기본 운동 DB (복근 / 코어 / 어시스트 풀업 포함)
+// 방대한 운동 DB (120+ 종목 포함)
 const EXERCISE_DATABASE = [
-  // 가슴
+  // ─── 가슴 (Chest) ───
   { name: "바벨 벤치프레스", category: "가슴", isOneArm: false },
   { name: "덤벨 벤치프레스", category: "가슴", isOneArm: false },
   { name: "스미스 머신 벤치프레스", category: "가슴", isOneArm: false },
+  { name: "체스트 프레스 머신", category: "가슴", isOneArm: false },
   { name: "바벨 인클라인 벤치프레스", category: "가슴", isOneArm: false },
   { name: "덤벨 인클라인 벤치프레스", category: "가슴", isOneArm: false },
+  { name: "스미스 머신 인클라인 벤치프레스", category: "가슴", isOneArm: false },
+  { name: "인클라인 체스트 프레스 머신", category: "가슴", isOneArm: false },
+  { name: "디클라인 벤치프레스", category: "가슴", isOneArm: false },
+  { name: "덤벨 디클라인 벤치프레스", category: "가슴", isOneArm: false },
+  { name: "덤벨 체스트 플라이", category: "가슴", isOneArm: false },
+  { name: "인클라인 덤벨 플라이", category: "가슴", isOneArm: false },
+  { name: "펙덱 플라이 머신", category: "가슴", isOneArm: false },
   { name: "케이블 체스트 플라이", category: "가슴", isOneArm: false },
-  { name: "딥스", category: "가슴", isOneArm: false },
+  { name: "케이블 하이투로우 플라이", category: "가슴", isOneArm: false },
+  { name: "케이블 로우투하이 플라이", category: "가슴", isOneArm: false },
+  { name: "딥스 (가슴 자극)", category: "가슴", isOneArm: false },
+  { name: "어시스트 딥스 머신", category: "가슴", isOneArm: false },
+  { name: "푸쉬업 (팔굽혀펴기)", category: "가슴", isOneArm: false },
+  { name: "디클라인 푸쉬업", category: "가슴", isOneArm: false },
+  { name: "인클라인 푸쉬업", category: "가슴", isOneArm: false },
 
-  // 등
+  // ─── 등 (Back) ───
   { name: "풀업 (맨몸 턱걸이)", category: "등", isOneArm: false },
   { name: "어시스트 풀업 (머신 보조)", category: "등", isOneArm: false },
+  { name: "친업 (언더그립 턱걸이)", category: "등", isOneArm: false },
   { name: "렛풀다운 (오버그립)", category: "등", isOneArm: false },
   { name: "렛풀다운 (언더그립)", category: "등", isOneArm: false },
+  { name: "렛풀다운 (와이드그립)", category: "등", isOneArm: false },
   { name: "클로즈그립 렛풀다운", category: "등", isOneArm: false },
+  { name: "패러렐그립 렛풀다운", category: "등", isOneArm: false },
   { name: "원암 케이블 렛풀다운", category: "등", isOneArm: true },
-  { name: "바벨로우", category: "등", isOneArm: false },
+  { name: "컨벤셔널 데드리프트", category: "등", isOneArm: false },
+  { name: "루마니안 데드리프트", category: "등", isOneArm: false },
+  { name: "렉풀 (부분 데드리프트)", category: "등", isOneArm: false },
+  { name: "바벨로우 (오버그립)", category: "등", isOneArm: false },
+  { name: "바벨로우 (언더그립)", category: "등", isOneArm: false },
+  { name: "펜들레이 로우", category: "등", isOneArm: false },
   { name: "덤벨로우", category: "등", isOneArm: false },
   { name: "원암 덤벨로우", category: "등", isOneArm: true },
-  { name: "시티드 케이블로우", category: "등", isOneArm: false },
-  { name: "컨벤셔널 데드리프트", category: "등", isOneArm: false },
+  { name: "시티드 케이블로우 (패러렐그립)", category: "등", isOneArm: false },
+  { name: "시티드 케이블로우 (와이드그립)", category: "등", isOneArm: false },
+  { name: "원암 케이블로우", category: "등", isOneArm: true },
+  { name: "T바 로우", category: "등", isOneArm: false },
+  { name: "시티드 로우 머신", category: "등", isOneArm: false },
+  { name: "원암 로우 머신", category: "등", isOneArm: true },
+  { name: "케이블 암 풀다운 (스트레이트 암)", category: "등", isOneArm: false },
+  { name: "백 익스텐션", category: "등", isOneArm: false },
 
-  // 어깨
-  { name: "[전면] 바벨 오버헤드 프레스", category: "어깨", isOneArm: false },
+  // ─── 어깨 (Shoulders) ───
+  { name: "[전면] 바벨 오버헤드 프레스 (OHP)", category: "어깨", isOneArm: false },
+  { name: "[전면] 스미스 머신 숄더 프레스", category: "어깨", isOneArm: false },
   { name: "[전면] 덤벨 숄더 프레스", category: "어깨", isOneArm: false },
+  { name: "[전면] 아놀드 프레스", category: "어깨", isOneArm: false },
+  { name: "[전면] 숄더 프레스 머신", category: "어깨", isOneArm: false },
+  { name: "[전면] 바벨 프론트 레이즈", category: "어깨", isOneArm: false },
+  { name: "[전면] 덤벨 프론트 레이즈", category: "어깨", isOneArm: false },
+  { name: "[전면] 케이블 프론트 레이즈", category: "어깨", isOneArm: false },
   { name: "[측면] 덤벨 사이드 레이터럴 레이즈", category: "어깨", isOneArm: false },
   { name: "[측면] 케이블 사이드 레이터럴 레이즈", category: "어깨", isOneArm: false },
+  { name: "[측면] 원암 케이블 사이드 레이터럴 레이즈", category: "어깨", isOneArm: true },
+  { name: "[측면] 머신 사이드 레이터럴 레이즈", category: "어깨", isOneArm: false },
+  { name: "[측면] 바벨 업라이트 로우", category: "어깨", isOneArm: false },
+  { name: "[측면] 케이블 업라이트 로우", category: "어깨", isOneArm: false },
   { name: "[후면] 덤벨 리버스 플라이", category: "후면어깨", isOneArm: false },
+  { name: "[후면] 리버스 펙덱 플라이 머신", category: "후면어깨", isOneArm: false },
   { name: "[후면] 케이블 페이스풀", category: "후면어깨", isOneArm: false },
+  { name: "[후면] 벤트오버 레이터럴 레이즈", category: "후면어깨", isOneArm: false },
+  { name: "[승모] 바벨 슈러그", category: "어깨", isOneArm: false },
+  { name: "[승모] 덤벨 슈러그", category: "어깨", isOneArm: false },
 
-  // 하체
+  // ─── 하체 (Legs) ───
   { name: "[투레그] 바벨 백스쿼트", category: "하체", isOneArm: false },
+  { name: "[투레그] 바벨 프론트스쿼트", category: "하체", isOneArm: false },
+  { name: "[투레그] 스미스 머신 스쿼트", category: "하체", isOneArm: false },
+  { name: "[투레그] 헥 스쿼트 머신", category: "하체", isOneArm: false },
+  { name: "[투레그] V-스쿼트 머신", category: "하체", isOneArm: false },
   { name: "[투레그] 레그 프레스", category: "하체", isOneArm: false },
+  { name: "[투레그] 파워 레그 프레스", category: "하체", isOneArm: false },
   { name: "[투레그] 레그 익스텐션", category: "하체", isOneArm: false },
-  { name: "[투레그] 레그 컬", category: "하체", isOneArm: false },
+  { name: "[투레그] 라잉 레그 컬", category: "하체", isOneArm: false },
+  { name: "[투레그] 시티드 레그 컬", category: "하체", isOneArm: false },
+  { name: "[투레그] 스티프 레그 데드리프트", category: "하체", isOneArm: false },
   { name: "[원레그] 덤벨 런지", category: "하체", isOneArm: true },
+  { name: "[원레그] 바벨 워킹 런지", category: "하체", isOneArm: true },
+  { name: "[원레그] 불가리안 스플릿 스쿼트 (보스쿠)", category: "하체", isOneArm: true },
+  { name: "[원레그] 싱글 레그 익스텐션", category: "하체", isOneArm: true },
+  { name: "[원레그] 싱글 레그 컬", category: "하체", isOneArm: true },
+  { name: "[엉덩이] 바벨 힙 쓰러스터", category: "하체", isOneArm: false },
+  { name: "[엉덩이] 머신 힙 쓰러스터", category: "하체", isOneArm: false },
+  { name: "[엉덩이] 이너사이 (아웃사이) 머신", category: "하체", isOneArm: false },
+  { name: "[종아리] 스탠딩 카프 레이즈", category: "하체", isOneArm: false },
+  { name: "[종아리] 시티드 카프 레이즈", category: "하체", isOneArm: false },
 
-  // 복근 / 코어
+  // ─── 삼두 (Triceps) ───
+  { name: "케이블 푸쉬다운 (일자바)", category: "삼두", isOneArm: false },
+  { name: "케이블 푸쉬다운 (로프)", category: "삼두", isOneArm: false },
+  { name: "케이블 푸쉬다운 (V바)", category: "삼두", isOneArm: false },
+  { name: "바벨 트라이셉스 익스텐션 (라잉)", category: "삼두", isOneArm: false },
+  { name: "EZ바 오버헤드 트라이셉스 익스텐션", category: "삼두", isOneArm: false },
+  { name: "덤벨 오버헤드 트라이셉스 익스텐션", category: "삼두", isOneArm: false },
+  { name: "원암 덤벨 익스텐션", category: "삼두", isOneArm: true },
+  { name: "원암 케이블 트라이셉스 익스텐션", category: "삼두", isOneArm: true },
+  { name: "클로즈그립 벤치프레스", category: "삼두", isOneArm: false },
+  { name: "덤벨 킥백", category: "삼두", isOneArm: false },
+  { name: "벤치 딥스", category: "삼두", isOneArm: false },
+
+  // ─── 이두 (Biceps) ───
+  { name: "바벨 컬", category: "이두", isOneArm: false },
+  { name: "EZ바 컬", category: "이두", isOneArm: false },
+  { name: "덤벨 컬", category: "이두", isOneArm: false },
+  { name: "덤벨 해머 컬", category: "이두", isOneArm: false },
+  { name: "인클라인 덤벨 컬", category: "이두", isOneArm: false },
+  { name: "프리처 컬 (바벨/EZ바)", category: "이두", isOneArm: false },
+  { name: "머신 프리처 컬", category: "이두", isOneArm: false },
+  { name: "케이블 바이셉스 컬", category: "이두", isOneArm: false },
+  { name: "원암 케이블 컬", category: "이두", isOneArm: true },
+  { name: "컨센트레이션 컬", category: "이두", isOneArm: true },
+  { name: "리버스 바벨 컬 (전완근)", category: "이두", isOneArm: false },
+  { name: "리스토 컬 (전완근)", category: "이두", isOneArm: false },
+
+  // ─── 복근 / 코어 (Abs / Core) ───
   { name: "플랭크", category: "복근", isOneArm: false },
+  { name: "사이드 플랭크", category: "복근", isOneArm: false },
   { name: "행잉 레그 레이즈", category: "복근", isOneArm: false },
+  { name: "행잉 닌니 레이즈", category: "복근", isOneArm: false },
   { name: "크런치", category: "복근", isOneArm: false },
+  { name: "디클라인 크런치", category: "복근", isOneArm: false },
+  { name: "케이블 크런치 (크런치 로프)", category: "복근", isOneArm: false },
   { name: "바이시클 크런치", category: "복근", isOneArm: false },
+  { name: "라잉 레그 레이즈", category: "복근", isOneArm: false },
   { name: "AB 슬라이드 (아브휠)", category: "복근", isOneArm: false },
   { name: "케이블 우드칩", category: "복근", isOneArm: false },
+  { name: "러시안 트위스트", category: "복근", isOneArm: false },
+  { name: "복근 머신 (어브도미널)", category: "복근", isOneArm: false },
 
-  // 팔
-  { name: "바벨 트라이셉스 익스텐션", category: "삼두", isOneArm: false },
-  { name: "케이블 푸쉬다운", category: "삼두", isOneArm: false },
-  { name: "바벨 컬", category: "이두", isOneArm: false },
-  { name: "덤벨 컬", category: "이두", isOneArm: false },
+  // ─── 전신 / 유산소 (Cardio & Full Body) ───
+  { name: "버피 테스트", category: "유산소", isOneArm: false },
+  { name: "케틀벨 스윙", category: "유산소", isOneArm: false },
+  { name: "천국의 계단 (스텝밀)", category: "유산소", isOneArm: false },
+  { name: "런닝머신 (인클라인)", category: "유산소", isOneArm: false },
+  { name: "실내 자전거 (사이클)", category: "유산소", isOneArm: false },
+  { name: "로잉 머신", category: "유산소", isOneArm: false },
 ];
 
 const DAYS = ["월요일", "화요일", "수요일", "목요일", "금요일", "토요일", "일요일"];
-const CATEGORIES = ["전체", "가슴", "등", "어깨", "후면어깨", "하체", "복근", "이두", "삼두", "원암 🦾"];
+const CATEGORIES = ["전체", "가슴", "등", "어깨", "후면어깨", "하체", "복근", "이두", "삼두", "유산소", "원암 🦾"];
 
 interface SetItem {
   setNumber: number;
@@ -95,7 +189,7 @@ export default function GymTracker() {
 
   const [routines, setRoutines] = useState<WeeklyRoutine[]>([]);
   const [editingRoutineId, setEditingRoutineId] = useState<string | null>(null);
-  const [isLoaded, setIsLoaded] = useState(false); // 로딩 플래그
+  const [isLoaded, setIsLoaded] = useState(false);
 
   const [currentWorkout, setCurrentWorkout] = useState<{
     title: string;
@@ -117,7 +211,6 @@ export default function GymTracker() {
     }, {} as Record<string, DaySchedule>)
   );
 
-  // 1. 처음 들어왔을 때 저장된 기존 루틴 데이터 안전하게 불러오기
   useEffect(() => {
     const savedRoutines = localStorage.getItem("gym_routines");
     const savedLogs = localStorage.getItem("gym_logs");
@@ -129,7 +222,7 @@ export default function GymTracker() {
           setRoutines(parsed);
         }
       } catch (e) {
-        console.error("루틴 불러오기 오류", e);
+        console.error("루틴 로드 오류", e);
       }
     }
 
@@ -140,14 +233,13 @@ export default function GymTracker() {
           setWorkoutLogs(parsedLogs);
         }
       } catch (e) {
-        console.error("기록 불러오기 오류", e);
+        console.error("기록 로드 오류", e);
       }
     }
 
-    setIsLoaded(true); // 데이터 로드 완료
+    setIsLoaded(true);
   }, []);
 
-  // 2. 루틴 데이터 변경 시에만 localStorage 업데이트 (불러오기 완료 이후에만 실행)
   useEffect(() => {
     if (isLoaded) {
       localStorage.setItem("gym_routines", JSON.stringify(routines));
@@ -160,7 +252,6 @@ export default function GymTracker() {
     }
   }, [workoutLogs, isLoaded]);
 
-  // 이전 세트 기록 자동 기억 불러오기
   const getLastSetData = (exerciseName: string): SetItem[] => {
     for (const log of workoutLogs) {
       const foundEx = log.exercises.find((e) => e.name === exerciseName);
@@ -191,7 +282,9 @@ export default function GymTracker() {
 
   const addExerciseToScheduleDay = (day: string, exName: string) => {
     const found = EXERCISE_DATABASE.find((e) => e.name === exName);
-    if (!found) return;
+    const exerciseToAdd = found
+      ? { name: found.name, category: found.category, isOneArm: found.isOneArm }
+      : { name: exName, category: "기타", isOneArm: false };
 
     setEditingSchedule((prev) => {
       const currentDay = prev[day];
@@ -199,7 +292,7 @@ export default function GymTracker() {
         ...prev,
         [day]: {
           ...currentDay,
-          exercises: [...currentDay.exercises, { name: found.name, category: found.category, isOneArm: found.isOneArm }],
+          exercises: [...currentDay.exercises, exerciseToAdd],
         },
       };
     });
@@ -247,19 +340,19 @@ export default function GymTracker() {
       setRoutines((prev) =>
         prev.map((r) =>
           r.id === editingRoutineId
-            ? { ...r, name: newRoutineName, schedule: editingSchedule }
+            ? { ...r, name: newRoutineName, schedule: JSON.parse(JSON.stringify(editingSchedule)) }
             : r
         )
       );
-      alert(`'${newRoutineName}' 루틴이 수정되었습니다.`);
+      alert(`'${newRoutineName}' 루틴 수정이 완료되었습니다.`);
     } else {
       const created: WeeklyRoutine = {
         id: Date.now().toString(),
         name: newRoutineName,
-        schedule: editingSchedule,
+        schedule: JSON.parse(JSON.stringify(editingSchedule)),
       };
       setRoutines((prev) => [...prev, created]);
-      alert(`'${newRoutineName}' 루틴이 추가되었습니다.`);
+      alert(`'${newRoutineName}' 새 루틴이 저장되었습니다.`);
     }
 
     cancelEditRoutine();
@@ -283,8 +376,8 @@ export default function GymTracker() {
 
     const loaded: ExerciseItem[] = todaySchedule.exercises.map((ex) => ({
       name: ex.name,
-      category: ex.category,
-      isOneArm: ex.isOneArm,
+      category: ex.category || "기타",
+      isOneArm: ex.isOneArm || false,
       sets: getLastSetData(ex.name),
     }));
 
@@ -298,17 +391,17 @@ export default function GymTracker() {
 
   const addExerciseToWorkout = (exName: string) => {
     const found = EXERCISE_DATABASE.find((e) => e.name === exName);
-    if (!found) return;
+    const exerciseToAdd = found
+      ? { name: found.name, category: found.category, isOneArm: found.isOneArm }
+      : { name: exName, category: "기타", isOneArm: false };
 
     setCurrentWorkout((prev) => ({
       ...prev,
       exercises: [
         ...prev.exercises,
         {
-          name: found.name,
-          category: found.category,
-          isOneArm: found.isOneArm,
-          sets: getLastSetData(found.name),
+          ...exerciseToAdd,
+          sets: getLastSetData(exerciseToAdd.name),
         },
       ],
     }));
@@ -363,7 +456,7 @@ export default function GymTracker() {
       <header className="flex justify-between items-center mb-6 pb-4 border-b border-slate-800">
         <div>
           <h1 className="text-2xl font-bold text-blue-500">⚡ GYM TRACKER</h1>
-          <p className="text-xs text-slate-400">루틴 유지 & 무게/횟수 자동 기억 앱</p>
+          <p className="text-xs text-slate-400">120+ 운동 종목 탑재 및 데이터 완전 보존</p>
         </div>
         <input
           type="date"
@@ -405,7 +498,7 @@ export default function GymTracker() {
           <div className="bg-slate-900 p-4 rounded-xl border border-slate-800 space-y-2">
             <h3 className="text-xs font-semibold text-slate-400">⚡ 내 루틴 불러오기</h3>
             {routines.length === 0 ? (
-              <p className="text-xs text-slate-500 py-1">[루틴 설정] 탭에서 루틴을 등록해주세요.</p>
+              <p className="text-xs text-slate-500 py-1">[루틴 목록] 탭에서 루틴을 작성해주세요.</p>
             ) : (
               <div className="flex gap-2 overflow-x-auto pb-1">
                 {routines.map((r) => (
@@ -423,7 +516,7 @@ export default function GymTracker() {
           </div>
 
           <div className="bg-slate-900 p-4 rounded-xl border border-slate-800 space-y-3">
-            <h3 className="text-sm font-semibold text-slate-300">🔍 개별 종목 추가 (이전 무게/횟수 자동입력)</h3>
+            <h3 className="text-sm font-semibold text-slate-300">🔍 개별 종목 추가</h3>
             <div className="flex gap-1 overflow-x-auto pb-1">
               {CATEGORIES.map((cat) => (
                 <button
@@ -447,7 +540,7 @@ export default function GymTracker() {
               }}
               className="w-full bg-slate-800 border border-slate-700 text-sm text-slate-200 rounded-lg p-2.5"
             >
-              <option value="">-- 종목 선택 --</option>
+              <option value="">-- 종목 선택 ({filteredExercises.length}개) --</option>
               {filteredExercises.map((ex, idx) => (
                 <option key={idx} value={ex.name}>
                   [{ex.category}] {ex.name} {ex.isOneArm ? "(원암)" : ""}
@@ -459,7 +552,7 @@ export default function GymTracker() {
           <div className="space-y-4">
             {currentWorkout.exercises.length === 0 ? (
               <div className="text-center py-12 text-slate-500 bg-slate-900/40 rounded-xl border border-dashed border-slate-800">
-                루틴을 선택하거나 종목을 직접 추가해 세트를 진행하세요.
+                루틴을 선택하거나 종목을 직접 추가해 진행하세요.
               </div>
             ) : (
               currentWorkout.exercises.map((ex, exIdx) => (
@@ -476,7 +569,7 @@ export default function GymTracker() {
                   <div className="space-y-2">
                     <div className="grid grid-cols-12 gap-2 text-[10px] text-slate-400 text-center font-bold">
                       <span className="col-span-2">세트</span>
-                      <span className="col-span-4">무게 (kg/보조)</span>
+                      <span className="col-span-4">무게 (kg)</span>
                       <span className="col-span-4">횟수</span>
                       <span className="col-span-2">완료</span>
                     </div>
@@ -548,7 +641,7 @@ export default function GymTracker() {
 
             <input
               type="text"
-              placeholder="루틴 이름 (예: 내 맞춤 3분할, 복근+상체 루틴 등)"
+              placeholder="루틴 이름 (예: 내 맞춤 3분할)"
               value={newRoutineName}
               onChange={(e) => setNewRoutineName(e.target.value)}
               className="w-full bg-slate-800 border border-slate-700 rounded-lg p-2.5 text-sm text-slate-100"
@@ -646,6 +739,17 @@ export default function GymTracker() {
                       불러오기 ➔
                     </button>
                   </div>
+                </div>
+                <div className="grid grid-cols-7 gap-1 text-[11px] text-center">
+                  {DAYS.map((day) => {
+                    const sched = r.schedule[day];
+                    return (
+                      <div key={day} className={`p-1.5 rounded ${sched?.isRest ? "bg-slate-800/40 text-slate-500" : "bg-blue-950/40 text-blue-300 font-semibold"}`}>
+                        <div>{day.replace("요일", "")}</div>
+                        <div className="text-[9px] mt-0.5">{sched?.isRest ? "휴식" : `${sched?.exercises.length || 0}개`}</div>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             ))}
