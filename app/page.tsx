@@ -89,9 +89,9 @@ const CATEGORIES = ["전체", "가슴", "등", "어깨", "후면어깨", "하체
 
 interface SetItem {
   setNumber: number;
-  weight: number | string;  // 웨이트 무게 또는 맨몸 추가 중량
-  reps: number | string;    // 횟수
-  time: number | string;    // 유산소 시간 (분)
+  weight: number | string;   // 웨이트 무게 또는 맨몸 추가 중량
+  reps: number | string;     // 횟수
+  time: number | string;     // 유산소 시간 (분)
   distance: number | string; // 유산소 거리 (km)
   completed: boolean;
 }
@@ -399,19 +399,28 @@ export default function GymTracker() {
     });
   };
 
+  // ⭐️ 소수점 지원 세트 업데이트 함수 ⭐️
   const updateSet = (exIdx: number, setIdx: number, field: keyof SetItem, val: string | boolean) => {
     setCurrentWorkout((prev) => {
-      const updated = [...prev.exercises];
-      const targetSets = [...updated[exIdx].sets];
+      const updated = [...prev].map((ex) => ({ ...ex, sets: [...ex.sets] }));
+      const targetSets = updated[exIdx].sets;
 
       if (field === "completed") {
         targetSets[setIdx] = { ...targetSets[setIdx], completed: Boolean(val) };
       } else {
         let cleanVal: number | string = val as string;
-        if (cleanVal !== "") {
-          cleanVal = Number(cleanVal);
-          if (isNaN(cleanVal)) cleanVal = "";
+
+        if (typeof cleanVal === "string") {
+          // 숫자와 소수점(.) 이외의 문자 제거
+          cleanVal = cleanVal.replace(/[^0-9.]/g, "");
+
+          // 소수점이 중복 입력되는 현상 방지
+          const parts = cleanVal.split(".");
+          if (parts.length > 2) {
+            cleanVal = parts[0] + "." + parts.slice(1).join("");
+          }
         }
+
         targetSets[setIdx] = { ...targetSets[setIdx], [field]: cleanVal };
       }
 
@@ -564,7 +573,7 @@ export default function GymTracker() {
       <header className="flex justify-between items-center mb-6 pb-4 border-b border-slate-800">
         <div>
           <h1 className="text-2xl font-bold text-blue-500">⚡ GYM TRACKER</h1>
-          <p className="text-xs text-slate-400">운동 유형별 맞춤 기록 지원</p>
+          <p className="text-xs text-slate-400">운동 유형별 맞춤 기록 지원 (소수점 가능)</p>
         </div>
         <input
           type="date"
@@ -708,7 +717,6 @@ export default function GymTracker() {
                     </div>
 
                     <div className="space-y-2">
-                      {/* Dynamic Header Depending on Exercise Type */}
                       <div className="grid grid-cols-12 gap-2 text-[10px] text-slate-400 text-center font-bold">
                         <span className="col-span-2">세트</span>
                         {exType === "cardio" ? (
@@ -731,7 +739,6 @@ export default function GymTracker() {
                         <span className="col-span-1">삭제</span>
                       </div>
 
-                      {/* Dynamic Set Inputs */}
                       {ex.sets.map((s, setIdx) => (
                         <div key={setIdx} className="grid grid-cols-12 gap-2 items-center">
                           <span className="col-span-2 text-center text-xs text-slate-400">{s.setNumber}세트</span>
@@ -740,7 +747,7 @@ export default function GymTracker() {
                             <>
                               <input
                                 type="text"
-                                inputMode="numeric"
+                                inputMode="decimal"
                                 value={s.time}
                                 onChange={(e) => updateSet(exIdx, setIdx, "time", e.target.value)}
                                 placeholder="분"
@@ -748,7 +755,7 @@ export default function GymTracker() {
                               />
                               <input
                                 type="text"
-                                inputMode="numeric"
+                                inputMode="decimal"
                                 value={s.distance}
                                 onChange={(e) => updateSet(exIdx, setIdx, "distance", e.target.value)}
                                 placeholder="km"
@@ -759,7 +766,7 @@ export default function GymTracker() {
                             <>
                               <input
                                 type="text"
-                                inputMode="numeric"
+                                inputMode="decimal"
                                 value={s.weight}
                                 onChange={(e) => updateSet(exIdx, setIdx, "weight", e.target.value)}
                                 placeholder={exType === "bodyweight" ? "0 (맨몸)" : "무게"}
