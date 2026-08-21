@@ -89,10 +89,10 @@ const CATEGORIES = ["전체", "가슴", "등", "어깨", "후면어깨", "하체
 
 interface SetItem {
   setNumber: number;
-  weight: number | string;   // 웨이트 무게 또는 맨몸 추가 중량
-  reps: number | string;     // 횟수
-  time: number | string;     // 유산소 시간 (분)
-  distance: number | string; // 유산소 거리 (km)
+  weight: number | string;
+  reps: number | string;
+  time: number | string;
+  distance: number | string;
   completed: boolean;
 }
 
@@ -399,10 +399,10 @@ export default function GymTracker() {
     });
   };
 
-  // ⭐️ 소수점 지원 세트 업데이트 함수 ⭐️
+  // ⭐️ 타입 오류가 수정된 updateSet 함수 ⭐️
   const updateSet = (exIdx: number, setIdx: number, field: keyof SetItem, val: string | boolean) => {
     setCurrentWorkout((prev) => {
-      const updated = [...prev].map((ex) => ({ ...ex, sets: [...ex.sets] }));
+      const updated = prev.exercises.map((ex) => ({ ...ex, sets: [...ex.sets] }));
       const targetSets = updated[exIdx].sets;
 
       if (field === "completed") {
@@ -411,10 +411,8 @@ export default function GymTracker() {
         let cleanVal: number | string = val as string;
 
         if (typeof cleanVal === "string") {
-          // 숫자와 소수점(.) 이외의 문자 제거
           cleanVal = cleanVal.replace(/[^0-9.]/g, "");
 
-          // 소수점이 중복 입력되는 현상 방지
           const parts = cleanVal.split(".");
           if (parts.length > 2) {
             cleanVal = parts[0] + "." + parts.slice(1).join("");
