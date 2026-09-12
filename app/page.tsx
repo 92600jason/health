@@ -30,7 +30,7 @@ const INITIAL_EXERCISE_DATABASE: ExerciseDef[] = [
   { id: "ex_12", name: "케이블 하이투로우 플라이", category: "가슴", isOneArm: false, type: "weight" },
   { id: "ex_13", name: "케이블 로우투하이 플라이", category: "가슴", isOneArm: false, type: "weight" },
   { id: "ex_14", name: "딥스 (가슴 자극)", category: "가슴", isOneArm: false, type: "bodyweight" },
-  { name: "푸쉬업 (팔굽혀펴기)", category: "가슴", isOneArm: false, type: "bodyweight", id: "ex_15" },
+  { id: "ex_15", name: "푸쉬업 (팔굽혀펴기)", category: "가슴", isOneArm: false, type: "bodyweight" },
 
   // 등
   { id: "ex_16", name: "풀업 (맨몸 턱걸이)", category: "등", isOneArm: false, type: "bodyweight" },
@@ -53,19 +53,19 @@ const INITIAL_EXERCISE_DATABASE: ExerciseDef[] = [
   { id: "ex_33", name: "백 익스텐션", category: "등", isOneArm: false, type: "bodyweight" },
 
   // 어깨 & 후면어깨
-  { id: "ex_34", name: "[전면] 바벨 오버헤드 프레스 (OHP)", category: "어깨", isOneArm: false, type: "weight" },
-  { id: "ex_35", name: "[전면] 스미스 머신 숄더 프레스", category: "어깨", isOneArm: false, type: "weight" },
-  { id: "ex_36", name: "[전면] 덤벨 숄더 프레스", category: "어깨", isOneArm: false, type: "weight" },
-  { id: "ex_37", name: "[전면] 아놀드 프레스", category: "어깨", isOneArm: false, type: "weight" },
-  { id: "ex_38", name: "[전면] 숄더 프레스 머신", category: "어깨", isOneArm: false, type: "weight" },
-  { id: "ex_39", name: "[측면] 덤벨 사이드 레이터럴 레이즈", category: "어깨", isOneArm: false, type: "weight" },
-  { id: "ex_40", name: "[측면] 케이블 사이드 레이터럴 레이즈", category: "어깨", isOneArm: false, type: "weight" },
-  { id: "ex_41", name: "[측면] 머신 사이드 레이터럴 레이즈", category: "어깨", isOneArm: false, type: "weight" },
-  { id: "ex_42", name: "[측면] 업라이트 로우", category: "어깨", isOneArm: false, type: "weight" },
-  { id: "ex_43", name: "[후면] 덤벨 리버스 플라이", category: "후면어깨", isOneArm: false, type: "weight" },
-  { id: "ex_44", name: "[후면] 리버스 펙덱 플라이 머신", category: "후면어깨", isOneArm: false, type: "weight" },
-  { id: "ex_45", name: "[후면] 케이블 페이스풀", category: "후면어깨", isOneArm: false, type: "weight" },
-  { id: "ex_46", name: "[후면] 벤트오버 레이터럴 레이즈", category: "후면어깨", isOneArm: false, type: "weight" },
+  { id: "ex_34", name: "바벨 오버헤드 프레스 (OHP)", category: "어깨", isOneArm: false, type: "weight" },
+  { id: "ex_35", name: "스미스 머신 숄더 프레스", category: "어깨", isOneArm: false, type: "weight" },
+  { id: "ex_36", name: "덤벨 숄더 프레스", category: "어깨", isOneArm: false, type: "weight" },
+  { id: "ex_37", name: "아놀드 프레스", category: "어깨", isOneArm: false, type: "weight" },
+  { id: "ex_38", name: "숄더 프레스 머신", category: "어깨", isOneArm: false, type: "weight" },
+  { id: "ex_39", name: "덤벨 사이드 레이터럴 레이즈", category: "어깨", isOneArm: false, type: "weight" },
+  { id: "ex_40", name: "케이블 사이드 레이터럴 레이즈", category: "어깨", isOneArm: false, type: "weight" },
+  { id: "ex_41", name: "머신 사이드 레이터럴 레이즈", category: "어깨", isOneArm: false, type: "weight" },
+  { id: "ex_42", name: "업라이트 로우", category: "어깨", isOneArm: false, type: "weight" },
+  { id: "ex_43", name: "덤벨 리버스 플라이", category: "후면어깨", isOneArm: false, type: "weight" },
+  { id: "ex_44", name: "리버스 펙덱 플라이 머신", category: "후면어깨", isOneArm: false, type: "weight" },
+  { id: "ex_45", name: "케이블 페이스풀", category: "후면어깨", isOneArm: false, type: "weight" },
+  { id: "ex_46", name: "벤트오버 레이터럴 레이즈", category: "후면어깨", isOneArm: false, type: "weight" },
 
   // 하체
   { id: "ex_47", name: "바벨 백스쿼트", category: "하체", isOneArm: false, type: "weight" },
@@ -152,6 +152,36 @@ interface WorkoutLog {
   exercises: ExerciseItem[];
 }
 
+// ⭐️ 이름에서 자동으로 직관적인 대괄호 태그를 추출하는 도우미 함수 ⭐️
+const renderTags = (ex: { name: string; isOneArm: boolean }) => {
+  const tags = [];
+  if (ex.isOneArm) tags.push(<span key="onearm" className="text-purple-400 font-extrabold">[원암]</span>);
+  if (ex.name.includes("스미스")) tags.push(<span key="smith" className="text-amber-400 font-extrabold">[스미스]</span>);
+  else if (ex.name.includes("덤벨")) tags.push(<span key="dumbbell" className="text-orange-400 font-extrabold">[덤벨]</span>);
+  else if (ex.name.includes("바벨")) tags.push(<span key="barbell" className="text-emerald-400 font-extrabold">[바벨]</span>);
+  else if (ex.name.includes("케이블")) tags.push(<span key="cable" className="text-sky-400 font-extrabold">[케이블]</span>);
+  else if (ex.name.includes("머신")) tags.push(<span key="machine" className="text-pink-400 font-extrabold">[머신]</span>);
+
+  return tags.length > 0 ? <span className="mr-1 space-x-1">{tags}</span> : null;
+};
+
+// 드롭다운 및 텍스트용 태그 추출기 (HTML 태그 없는 순수 문자열 반환)
+const getTagString = (name: string, isOneArm: boolean) => {
+  let tags = "";
+  if (isOneArm) tags += "[원암] ";
+  if (name.includes("스미스")) tags += "[스미스] ";
+  else if (name.includes("덤벨")) tags += "[덤벨] ";
+  else if (name.includes("바벨")) tags += "[바벨] ";
+  else if (name.includes("케이블")) tags += "[케이블] ";
+  else if (name.includes("머신")) tags += "[머신] ";
+  return tags;
+};
+
+// 기본 텍스트에서 태그 키워드를 제외한 깔끔한 이름 반환 (옵션)
+const cleanName = (name: string) => {
+  return name.replace(/스미스 머신|스미스|덤벨|바벨|케이블|머신/g, "").trim();
+};
+
 export default function GymTracker() {
   const [activeTab, setActiveTab] = useState<"log" | "routine" | "history">("log");
   const [selectedCategoryTab, setSelectedCategoryTab] = useState<string>("전체");
@@ -159,7 +189,6 @@ export default function GymTracker() {
     new Date().toISOString().split("T")[0]
   );
 
-  // ─── 커스텀 운동 DB 상태 ───
   const [exerciseDb, setExerciseDb] = useState<ExerciseDef[]>(INITIAL_EXERCISE_DATABASE);
   const [isManageModalOpen, setIsManageModalOpen] = useState(false);
   const [newExName, setNewExName] = useState("");
@@ -248,6 +277,9 @@ export default function GymTracker() {
         title: existingLog.title,
         exercises: JSON.parse(JSON.stringify(existingLog.exercises)),
       });
+    } else {
+        // 날짜를 바꿨는데 기록이 없으면 빈 배열로 초기화 (새로운 날짜)
+        setCurrentWorkout({ title: "오늘의 운동", exercises: [] });
     }
   }, [selectedDate, workoutLogs]);
 
@@ -455,6 +487,12 @@ export default function GymTracker() {
       return;
     }
 
+    if (currentWorkout.exercises.length > 0) {
+        if(!confirm("현재 작성 중인 목록 아래에 루틴을 추가할까요? (취소 시 덮어쓰기)")) {
+            setCurrentWorkout({ title: `${routine.name} - ${dayOfWeek}`, exercises: [] });
+        }
+    }
+
     const loaded: ExerciseItem[] = todaySchedule.exercises.map((ex) => ({
       name: ex.name,
       category: ex.category || "기타",
@@ -463,12 +501,27 @@ export default function GymTracker() {
       sets: getLastSetData(ex.name, ex.type || "weight"),
     }));
 
-    setCurrentWorkout({
-      title: `${routine.name} - ${dayOfWeek}`,
-      exercises: loaded,
-    });
+    setCurrentWorkout(prev => ({
+      title: prev.exercises.length === 0 ? `${routine.name} - ${dayOfWeek}` : prev.title,
+      exercises: [...prev.exercises, ...loaded],
+    }));
 
     setActiveTab("log");
+  };
+
+  // ⭐️ 과거 운동 기록 불러오기 기능 ⭐️
+  const loadPastLogToWorkout = (pastLog: WorkoutLog) => {
+      if(confirm(`'${pastLog.date}' 에 진행했던 운동 종목들을 그대로 불러올까요?`)) {
+          const loadedExs = pastLog.exercises.map(ex => ({
+              ...ex,
+              sets: ex.sets.map(s => ({ ...s, completed: false })) // 불러올 땐 완료 체크 해제
+          }));
+          
+          setCurrentWorkout(prev => ({
+              title: prev.title === "오늘의 운동" ? pastLog.title : prev.title,
+              exercises: [...prev.exercises, ...loadedExs]
+          }));
+      }
   };
 
   const addExerciseToWorkout = (exName: string) => {
@@ -605,13 +658,12 @@ export default function GymTracker() {
         updated[existingIdx] = newLogItem;
         return updated;
       }
-      return [newLogItem, ...prev];
+      return [newLogItem, ...prev].sort((a, b) => (a.date < b.date ? 1 : -1));
     });
 
     alert(`${selectedDate} 운동 기록이 저장되었습니다!`);
   };
 
-  // ⭐️ 선택된 카테고리 탭에 맞게 걸러진 운동 목록 ⭐️
   const filteredExercises = exerciseDb.filter((ex) => {
     if (selectedCategoryTab === "전체") return true;
     if (selectedCategoryTab === "원암 🦾") return ex.isOneArm;
@@ -679,6 +731,9 @@ export default function GymTracker() {
 
   const selectedLogDetail = workoutLogs.find((l) => l.date === viewingLogDate);
 
+  // 최근 운동 기록 (최대 7개만 보여주기)
+  const recentLogs = [...workoutLogs].sort((a, b) => (a.date < b.date ? 1 : -1)).slice(0, 7);
+
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 p-4 max-w-2xl mx-auto">
       <header className="flex justify-between items-center mb-6 pb-4 border-b border-slate-800">
@@ -724,24 +779,49 @@ export default function GymTracker() {
       {/* 1. 운동 기록 탭 */}
       {activeTab === "log" && (
         <section className="space-y-6">
-          <div className="bg-slate-900 p-4 rounded-xl border border-slate-800 space-y-2">
-            <h3 className="text-xs font-semibold text-slate-400">⚡ 루틴에서 불러오기</h3>
-            {routines.length === 0 ? (
-              <p className="text-xs text-slate-500 py-1">[루틴 목록] 탭에서 먼저 루틴을 작성하세요.</p>
-            ) : (
-              <div className="flex gap-2 overflow-x-auto pb-1">
-                {routines.map((r) => (
-                  <button
-                    key={r.id}
-                    onClick={() => loadRoutineToLog(r)}
-                    className="bg-slate-800 hover:bg-blue-900/50 border border-slate-700 text-xs px-3 py-2 rounded-lg text-left whitespace-nowrap"
-                  >
-                    <div className="font-bold text-slate-200">{r.name}</div>
-                    <div className="text-[10px] text-blue-400">오늘 요일 종목 세팅 ➔</div>
-                  </button>
-                ))}
-              </div>
-            )}
+          <div className="bg-slate-900 p-4 rounded-xl border border-slate-800 space-y-4">
+            
+            {/* 고정 루틴 불러오기 */}
+            <div className="space-y-2">
+                <h3 className="text-xs font-semibold text-slate-400">⚡ 정해둔 루틴에서 불러오기</h3>
+                {routines.length === 0 ? (
+                <p className="text-xs text-slate-500 py-1">[루틴 목록] 탭에서 먼저 루틴을 작성하세요.</p>
+                ) : (
+                <div className="flex gap-2 overflow-x-auto pb-1">
+                    {routines.map((r) => (
+                    <button
+                        key={r.id}
+                        onClick={() => loadRoutineToLog(r)}
+                        className="bg-slate-800 hover:bg-blue-900/50 border border-slate-700 text-xs px-3 py-2 rounded-lg text-left whitespace-nowrap"
+                    >
+                        <div className="font-bold text-slate-200">{r.name}</div>
+                        <div className="text-[10px] text-blue-400">오늘 요일 종목 세팅 ➔</div>
+                    </button>
+                    ))}
+                </div>
+                )}
+            </div>
+
+            {/* 과거 기록 불러오기 (새로운 기능) */}
+            <div className="space-y-2 border-t border-slate-800 pt-3">
+                <h3 className="text-xs font-semibold text-slate-400">🕒 과거 운동 기록 불러오기 (최근 7일)</h3>
+                {recentLogs.length === 0 ? (
+                <p className="text-xs text-slate-500 py-1">아직 저장된 운동 기록이 없습니다.</p>
+                ) : (
+                <div className="flex gap-2 overflow-x-auto pb-1">
+                    {recentLogs.map((log) => (
+                    <button
+                        key={log.date}
+                        onClick={() => loadPastLogToWorkout(log)}
+                        className="bg-slate-800/80 hover:bg-purple-900/40 border border-slate-700 text-xs px-3 py-2 rounded-lg text-left whitespace-nowrap"
+                    >
+                        <div className="font-bold text-slate-200">{log.date}</div>
+                        <div className="text-[10px] text-purple-400">조합 그대로 복사 ➔</div>
+                    </button>
+                    ))}
+                </div>
+                )}
+            </div>
           </div>
 
           {/* 🔍 종목 추가 영역 (부위별 필터 적용) */}
@@ -771,7 +851,7 @@ export default function GymTracker() {
               ))}
             </div>
 
-            {/* 필터링된 드롭다운 */}
+            {/* 필터링된 드롭다운 (텍스트 태그 반영) */}
             <select
               onChange={(e) => {
                 if (e.target.value) {
@@ -786,7 +866,7 @@ export default function GymTracker() {
               </option>
               {filteredExercises.map((ex) => (
                 <option key={ex.id} value={ex.name}>
-                  [{ex.category}] {ex.name} {ex.isOneArm ? "(원암)" : ""} {ex.isCustom ? "★" : ""}
+                  [{ex.category}] {getTagString(ex.name, ex.isOneArm)} {cleanName(ex.name)} {ex.isCustom ? "★" : ""}
                 </option>
               ))}
             </select>
@@ -810,7 +890,7 @@ export default function GymTracker() {
                 return (
                   <div key={exIdx} className="bg-slate-900 p-4 rounded-xl border border-slate-800 space-y-3">
                     <div className="flex justify-between items-center">
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-2 flex-wrap">
                         <div className="flex flex-col gap-0.5">
                           <button
                             disabled={exIdx === 0}
@@ -828,16 +908,21 @@ export default function GymTracker() {
                           </button>
                         </div>
 
-                        <span className="bg-blue-900/60 text-blue-300 text-xs font-bold px-2 py-0.5 rounded">
+                        <span className="bg-blue-900/60 text-blue-300 text-xs font-bold px-2 py-0.5 rounded mr-1">
                           {ex.category}
                         </span>
-                        <h4 className="font-bold text-slate-100">{ex.name}</h4>
+                        
+                        {/* ⭐️ 이름 앞에 직관적인 태그 렌더링 ⭐️ */}
+                        <div className="flex items-center">
+                            {renderTags(ex)}
+                            <h4 className="font-bold text-slate-100">{cleanName(ex.name)}</h4>
+                        </div>
                       </div>
                       <button
                         onClick={() => removeExerciseFromWorkout(exIdx)}
-                        className="text-xs text-red-400 hover:text-red-300 font-bold"
+                        className="text-xs text-red-400 hover:text-red-300 font-bold ml-2 whitespace-nowrap"
                       >
-                        종목 삭제
+                        삭제
                       </button>
                     </div>
 
@@ -1005,7 +1090,7 @@ export default function GymTracker() {
                           <option value="">+ {day} 운동 종목 추가</option>
                           {exerciseDb.map((ex) => (
                             <option key={ex.id} value={ex.name}>
-                              [{ex.category}] {ex.name}
+                              [{ex.category}] {getTagString(ex.name, ex.isOneArm)} {cleanName(ex.name)}
                             </option>
                           ))}
                         </select>
@@ -1024,7 +1109,7 @@ export default function GymTracker() {
                                 >
                                   ◀
                                 </button>
-                                {ex.name}
+                                {cleanName(ex.name)}
                                 <button
                                   disabled={eIdx === dayConfig.exercises.length - 1}
                                   onClick={() => moveExerciseInScheduleDay(day, eIdx, "down")}
@@ -1165,7 +1250,9 @@ export default function GymTracker() {
                           <span className="bg-blue-900 text-blue-300 text-[10px] px-1.5 py-0.5 rounded font-bold">
                             {ex.category}
                           </span>
-                          <span className="font-bold text-xs text-slate-200">{ex.name}</span>
+                          <span className="font-bold text-xs text-slate-200">
+                            {cleanName(ex.name)}
+                          </span>
                         </div>
                         <div className="grid grid-cols-3 gap-2 text-xs text-slate-300">
                           {ex.sets.map((s) => (
@@ -1305,8 +1392,9 @@ export default function GymTracker() {
                         <span className="bg-slate-900 text-blue-400 font-bold px-1.5 py-0.5 rounded text-[10px]">
                           {ex.category}
                         </span>
-                        <span className="font-semibold text-slate-200">{ex.name}</span>
-                        {ex.isOneArm && <span className="text-[10px]">🦾</span>}
+                        <span className="font-semibold text-slate-200">
+                           {getTagString(ex.name, ex.isOneArm)} {cleanName(ex.name)}
+                        </span>
                       </div>
 
                       <div className="flex gap-1">
