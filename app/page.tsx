@@ -13,109 +13,49 @@ export interface ExerciseDef {
   isCustom?: boolean;
 }
 
-// ─── 대폭 확장된 기본 운동 DATABASE ───
+// ─── 기본 운동 DATABASE ───
 const INITIAL_EXERCISE_DATABASE: ExerciseDef[] = [
   // 가슴
   { id: "ex_1", name: "바벨 벤치프레스", category: "가슴", isOneArm: false, type: "weight" },
   { id: "ex_2", name: "덤벨 벤치프레스", category: "가슴", isOneArm: false, type: "weight" },
   { id: "ex_3", name: "스미스 머신 벤치프레스", category: "가슴", isOneArm: false, type: "weight" },
-  { id: "ex_4", name: "체스트 프레스 머신", category: "가슴", isOneArm: false, type: "weight" },
-  { id: "ex_5", name: "바벨 인클라인 벤치프레스", category: "가슴", isOneArm: false, type: "weight" },
-  { id: "ex_6", name: "덤벨 인클라인 벤치프레스", category: "가슴", isOneArm: false, type: "weight" },
-  { id: "ex_7", name: "인클라인 체스트 프레스 머신", category: "가슴", isOneArm: false, type: "weight" },
-  { id: "ex_8", name: "덤벨 디클라인 벤치프레스", category: "가슴", isOneArm: false, type: "weight" },
   { id: "ex_9", name: "덤벨 체스트 플라이", category: "가슴", isOneArm: false, type: "weight" },
-  { id: "ex_10", name: "펙덱 플라이 머신", category: "가슴", isOneArm: false, type: "weight" },
   { id: "ex_11", name: "케이블 체스트 플라이", category: "가슴", isOneArm: false, type: "weight" },
-  { id: "ex_12", name: "케이블 하이투로우 플라이", category: "가슴", isOneArm: false, type: "weight" },
-  { id: "ex_13", name: "케이블 로우투하이 플라이", category: "가슴", isOneArm: false, type: "weight" },
-  { id: "ex_14", name: "딥스 (가슴 자극)", category: "가슴", isOneArm: false, type: "bodyweight" },
   { id: "ex_15", name: "푸쉬업 (팔굽혀펴기)", category: "가슴", isOneArm: false, type: "bodyweight" },
 
   // 등
   { id: "ex_16", name: "풀업 (맨몸 턱걸이)", category: "등", isOneArm: false, type: "bodyweight" },
-  { id: "ex_17", name: "어시스트 풀업 머신", category: "등", isOneArm: false, type: "weight" },
   { id: "ex_18", name: "렛풀다운 (오버그립)", category: "등", isOneArm: false, type: "weight" },
-  { id: "ex_19", name: "렛풀다운 (언더그립)", category: "등", isOneArm: false, type: "weight" },
-  { id: "ex_20", name: "클로즈그립 렛풀다운", category: "등", isOneArm: false, type: "weight" },
-  { id: "ex_21", name: "와이드그립 렛풀다운", category: "등", isOneArm: false, type: "weight" },
   { id: "ex_22", name: "컨벤셔널 데드리프트", category: "등", isOneArm: false, type: "weight" },
-  { id: "ex_23", name: "루마니안 데드리프트", category: "등", isOneArm: false, type: "weight" },
-  { id: "ex_24", name: "렉풀 (Rack Pull)", category: "등", isOneArm: false, type: "weight" },
   { id: "ex_25", name: "바벨로우", category: "등", isOneArm: false, type: "weight" },
-  { id: "ex_26", name: "펜들레이 로우", category: "등", isOneArm: false, type: "weight" },
-  { id: "ex_27", name: "덤벨로우", category: "등", isOneArm: false, type: "weight" },
   { id: "ex_28", name: "원암 덤벨로우", category: "등", isOneArm: true, type: "weight" },
-  { id: "ex_29", name: "시티드 케이블로우 (V바)", category: "등", isOneArm: false, type: "weight" },
-  { id: "ex_30", name: "시티드 케이블로우 (와이드바)", category: "등", isOneArm: false, type: "weight" },
-  { id: "ex_31", name: "T바 로우", category: "등", isOneArm: false, type: "weight" },
-  { id: "ex_32", name: "암 풀다운 (케이블)", category: "등", isOneArm: false, type: "weight" },
-  { id: "ex_33", name: "백 익스텐션", category: "등", isOneArm: false, type: "bodyweight" },
+  { id: "ex_29", name: "시티드 케이블로우", category: "등", isOneArm: false, type: "weight" },
 
   // 어깨 & 후면어깨
   { id: "ex_34", name: "바벨 오버헤드 프레스 (OHP)", category: "어깨", isOneArm: false, type: "weight" },
-  { id: "ex_35", name: "스미스 머신 숄더 프레스", category: "어깨", isOneArm: false, type: "weight" },
   { id: "ex_36", name: "덤벨 숄더 프레스", category: "어깨", isOneArm: false, type: "weight" },
-  { id: "ex_37", name: "아놀드 프레스", category: "어깨", isOneArm: false, type: "weight" },
-  { id: "ex_38", name: "숄더 프레스 머신", category: "어깨", isOneArm: false, type: "weight" },
   { id: "ex_39", name: "덤벨 사이드 레이터럴 레이즈", category: "어깨", isOneArm: false, type: "weight" },
-  { id: "ex_40", name: "케이블 사이드 레이터럴 레이즈", category: "어깨", isOneArm: false, type: "weight" },
-  { id: "ex_41", name: "머신 사이드 레이터럴 레이즈", category: "어깨", isOneArm: false, type: "weight" },
-  { id: "ex_42", name: "업라이트 로우", category: "어깨", isOneArm: false, type: "weight" },
-  { id: "ex_43", name: "덤벨 리버스 플라이", category: "후면어깨", isOneArm: false, type: "weight" },
-  { id: "ex_44", name: "리버스 펙덱 플라이 머신", category: "후면어깨", isOneArm: false, type: "weight" },
   { id: "ex_45", name: "케이블 페이스풀", category: "후면어깨", isOneArm: false, type: "weight" },
-  { id: "ex_46", name: "벤트오버 레이터럴 레이즈", category: "후면어깨", isOneArm: false, type: "weight" },
 
-  // 하체
+  // 하체 (원레그 운동 포함)
   { id: "ex_47", name: "바벨 백스쿼트", category: "하체", isOneArm: false, type: "weight" },
-  { id: "ex_48", name: "바벨 프론트 스쿼트", category: "하체", isOneArm: false, type: "weight" },
-  { id: "ex_49", name: "스미스 머신 스쿼트", category: "하체", isOneArm: false, type: "weight" },
-  { id: "ex_50", name: "핵 스쿼트 머신", category: "하체", isOneArm: false, type: "weight" },
-  { id: "ex_51", name: "덤벨 레귤러 스쿼트", category: "하체", isOneArm: false, type: "weight" },
-  { id: "ex_52", name: "덤벨 와이드 스쿼트", category: "하체", isOneArm: false, type: "weight" },
-  { id: "ex_53", name: "덤벨 고블렛 스쿼트", category: "하체", isOneArm: false, type: "weight" },
   { id: "ex_54", name: "레그 프레스", category: "하체", isOneArm: false, type: "weight" },
-  { id: "ex_55", name: "파워 레그 프레스", category: "하체", isOneArm: false, type: "weight" },
   { id: "ex_56", name: "레그 익스텐션", category: "하체", isOneArm: false, type: "weight" },
-  { id: "ex_57", name: "라잉 레그 컬", category: "하체", isOneArm: false, type: "weight" },
-  { id: "ex_58", name: "시티드 레그 컬", category: "하체", isOneArm: false, type: "weight" },
-  { id: "ex_59", name: "스티프 레그 데드리프트", category: "하체", isOneArm: false, type: "weight" },
   { id: "ex_60", name: "덤벨 런지", category: "하체", isOneArm: true, type: "weight" },
   { id: "ex_61", name: "불가리안 스플릿 스쿼트", category: "하체", isOneArm: true, type: "weight" },
-  { id: "ex_62", name: "바벨 힙 쓰러스터", category: "하체", isOneArm: false, type: "weight" },
-  { id: "ex_63", name: "이너싸이 (아웃타이/이너타이)", category: "하체", isOneArm: false, type: "weight" },
-  { id: "ex_64", name: "카프 레이즈", category: "하체", isOneArm: false, type: "weight" },
 
   // 이두 & 삼두 & 복근
   { id: "ex_65", name: "바벨 컬", category: "이두", isOneArm: false, type: "weight" },
-  { id: "ex_66", name: "EZ바 컬", category: "이두", isOneArm: false, type: "weight" },
-  { id: "ex_67", name: "덤벨 컬", category: "이두", isOneArm: false, type: "weight" },
-  { id: "ex_68", name: "덤벨 해머 컬", category: "이두", isOneArm: false, type: "weight" },
-  { id: "ex_69", name: "인클라인 덤벨 컬", category: "이두", isOneArm: false, type: "weight" },
-  { id: "ex_70", name: "프리처 컬", category: "이두", isOneArm: false, type: "weight" },
-  { id: "ex_71", name: "케이블 킥백", category: "삼두", isOneArm: true, type: "weight" },
-  { id: "ex_72", name: "케이블 푸쉬다운 (바)", category: "삼두", isOneArm: false, type: "weight" },
-  { id: "ex_73", name: "케이블 푸쉬다운 (로프)", category: "삼두", isOneArm: false, type: "weight" },
-  { id: "ex_74", name: "바벨 트라이셉스 익스텐션 (라잉)", category: "삼두", isOneArm: false, type: "weight" },
-  { id: "ex_75", name: "덤벨 오버헤드 익스텐션", category: "삼두", isOneArm: false, type: "weight" },
+  { id: "ex_72", name: "케이블 푸쉬다운", category: "삼두", isOneArm: false, type: "weight" },
   { id: "ex_76", name: "행잉 레그 레이즈", category: "복근", isOneArm: false, type: "bodyweight" },
-  { id: "ex_77", name: "행잉 닌자 키즈", category: "복근", isOneArm: false, type: "bodyweight" },
-  { id: "ex_78", name: "크런치", category: "복근", isOneArm: false, type: "bodyweight" },
-  { id: "ex_79", name: "케이블 크런치", category: "복근", isOneArm: false, type: "weight" },
-  { id: "ex_80", name: "플랭크", category: "복근", isOneArm: false, type: "bodyweight" },
-  { id: "ex_81", name: "시티드 니업", category: "복근", isOneArm: false, type: "bodyweight" },
 
   // 유산소
   { id: "ex_82", name: "천국의 계단 (스텝밀)", category: "유산소", isOneArm: false, type: "cardio" },
   { id: "ex_83", name: "런닝머신 (인클라인)", category: "유산소", isOneArm: false, type: "cardio" },
-  { id: "ex_84", name: "실내 자전거", category: "유산소", isOneArm: false, type: "cardio" },
-  { id: "ex_85", name: "로잉 머신", category: "유산소", isOneArm: false, type: "cardio" },
-  { id: "ex_86", name: "사이클 스피닝", category: "유산소", isOneArm: false, type: "cardio" },
 ];
 
 const DAYS = ["월요일", "화요일", "수요일", "목요일", "금요일", "토요일", "일요일"];
-const CATEGORIES = ["전체", "가슴", "등", "어깨", "후면어깨", "하체", "복근", "이두", "삼두", "유산소", "원암 🦾"];
+const CATEGORIES = ["전체", "가슴", "등", "어깨", "후면어깨", "하체", "복근", "이두", "삼두", "유산소", "원암/원레그 🦾"];
 
 interface SetItem {
   setNumber: number;
@@ -152,10 +92,16 @@ interface WorkoutLog {
   exercises: ExerciseItem[];
 }
 
-// ⭐️ 이름에서 자동으로 직관적인 대괄호 태그를 추출하는 도우미 함수 ⭐️
-const renderTags = (ex: { name: string; isOneArm: boolean }) => {
+// ⭐️ 하체 여부를 판단하여 [원레그] 또는 [원암] 으로 동적 변환 ⭐️
+const renderTags = (ex: { name: string; isOneArm: boolean; category: string }) => {
   const tags = [];
-  if (ex.isOneArm) tags.push(<span key="onearm" className="text-purple-400 font-extrabold">[원암]</span>);
+  if (ex.isOneArm) {
+    if (ex.category === "하체") {
+      tags.push(<span key="oneleg" className="text-fuchsia-400 font-extrabold">[원레그]</span>);
+    } else {
+      tags.push(<span key="onearm" className="text-purple-400 font-extrabold">[원암]</span>);
+    }
+  }
   if (ex.name.includes("스미스")) tags.push(<span key="smith" className="text-amber-400 font-extrabold">[스미스]</span>);
   else if (ex.name.includes("덤벨")) tags.push(<span key="dumbbell" className="text-orange-400 font-extrabold">[덤벨]</span>);
   else if (ex.name.includes("바벨")) tags.push(<span key="barbell" className="text-emerald-400 font-extrabold">[바벨]</span>);
@@ -165,10 +111,11 @@ const renderTags = (ex: { name: string; isOneArm: boolean }) => {
   return tags.length > 0 ? <span className="mr-1 space-x-1">{tags}</span> : null;
 };
 
-// 드롭다운 및 텍스트용 태그 추출기 (HTML 태그 없는 순수 문자열 반환)
-const getTagString = (name: string, isOneArm: boolean) => {
+const getTagString = (name: string, isOneArm: boolean, category: string) => {
   let tags = "";
-  if (isOneArm) tags += "[원암] ";
+  if (isOneArm) {
+    tags += category === "하체" ? "[원레그] " : "[원암] ";
+  }
   if (name.includes("스미스")) tags += "[스미스] ";
   else if (name.includes("덤벨")) tags += "[덤벨] ";
   else if (name.includes("바벨")) tags += "[바벨] ";
@@ -177,7 +124,6 @@ const getTagString = (name: string, isOneArm: boolean) => {
   return tags;
 };
 
-// 기본 텍스트에서 태그 키워드를 제외한 깔끔한 이름 반환 (옵션)
 const cleanName = (name: string) => {
   return name.replace(/스미스 머신|스미스|덤벨|바벨|케이블|머신/g, "").trim();
 };
@@ -185,6 +131,8 @@ const cleanName = (name: string) => {
 export default function GymTracker() {
   const [activeTab, setActiveTab] = useState<"log" | "routine" | "history">("log");
   const [selectedCategoryTab, setSelectedCategoryTab] = useState<string>("전체");
+  
+  // 오늘 날짜로 초기화
   const [selectedDate, setSelectedDate] = useState<string>(
     new Date().toISOString().split("T")[0]
   );
@@ -223,41 +171,41 @@ export default function GymTracker() {
     }, {} as Record<string, DaySchedule>)
   );
 
+  // ─── 데이터 초기 로드 및 드래프트(임시저장) 불러오기 ───
   useEffect(() => {
     const savedDb = localStorage.getItem("gym_exercise_db");
     const savedRoutines = localStorage.getItem("gym_routines");
     const savedLogs = localStorage.getItem("gym_logs");
 
-    if (savedDb) {
-      try {
-        const parsed = JSON.parse(savedDb);
-        if (Array.isArray(parsed) && parsed.length > 0) setExerciseDb(parsed);
-      } catch (e) {
-        console.error("운동 DB 로드 오류", e);
-      }
-    }
+    if (savedDb) setExerciseDb(JSON.parse(savedDb));
+    if (savedRoutines) setRoutines(JSON.parse(savedRoutines));
 
-    if (savedRoutines) {
-      try {
-        const parsed = JSON.parse(savedRoutines);
-        if (Array.isArray(parsed)) setRoutines(parsed);
-      } catch (e) {
-        console.error("루틴 로드 오류", e);
-      }
-    }
-
+    let parsedLogs: WorkoutLog[] = [];
     if (savedLogs) {
-      try {
-        const parsedLogs = JSON.parse(savedLogs);
-        if (Array.isArray(parsedLogs)) setWorkoutLogs(parsedLogs);
-      } catch (e) {
-        console.error("기록 로드 오류", e);
+      parsedLogs = JSON.parse(savedLogs);
+      setWorkoutLogs(parsedLogs);
+    }
+
+    // ⭐️ 새로고침 방어: 해당 날짜의 작성 중이던 내역(Draft) 불러오기
+    const initialDate = new Date().toISOString().split("T")[0];
+    const draftStr = localStorage.getItem(`gym_draft_${initialDate}`);
+    
+    if (draftStr) {
+      setCurrentWorkout(JSON.parse(draftStr));
+    } else {
+      const existingLog = parsedLogs.find((l) => l.date === initialDate);
+      if (existingLog) {
+        setCurrentWorkout({
+          title: existingLog.title,
+          exercises: JSON.parse(JSON.stringify(existingLog.exercises)),
+        });
       }
     }
 
     setIsLoaded(true);
   }, []);
 
+  // 각종 데이터 자동 저장
   useEffect(() => {
     if (isLoaded) localStorage.setItem("gym_exercise_db", JSON.stringify(exerciseDb));
   }, [exerciseDb, isLoaded]);
@@ -270,20 +218,42 @@ export default function GymTracker() {
     if (isLoaded) localStorage.setItem("gym_logs", JSON.stringify(workoutLogs));
   }, [workoutLogs, isLoaded]);
 
+  // ⭐️ 현재 작성 중인 운동 내역 실시간 임시저장 (새로고침 방어용)
   useEffect(() => {
-    const existingLog = workoutLogs.find((l) => l.date === selectedDate);
-    if (existingLog) {
-      setCurrentWorkout({
-        title: existingLog.title,
-        exercises: JSON.parse(JSON.stringify(existingLog.exercises)),
-      });
-    } else {
-        // 날짜를 바꿨는데 기록이 없으면 빈 배열로 초기화 (새로운 날짜)
-        setCurrentWorkout({ title: "오늘의 운동", exercises: [] });
+    if (isLoaded) {
+      localStorage.setItem(`gym_draft_${selectedDate}`, JSON.stringify(currentWorkout));
     }
-  }, [selectedDate, workoutLogs]);
+  }, [currentWorkout, selectedDate, isLoaded]);
 
-  // ─── 커스텀 운동 추가 / 수정 / 삭제 ───
+  // ⭐️ 날짜 변경 시 동작 (드래프트가 있으면 드래프트 우선, 없으면 저장된 기록)
+  const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newDate = e.target.value;
+    setSelectedDate(newDate);
+
+    const savedDraft = localStorage.getItem(`gym_draft_${newDate}`);
+    if (savedDraft) {
+      setCurrentWorkout(JSON.parse(savedDraft));
+    } else {
+      const existingLog = workoutLogs.find((l) => l.date === newDate);
+      if (existingLog) {
+        setCurrentWorkout({
+          title: existingLog.title,
+          exercises: JSON.parse(JSON.stringify(existingLog.exercises)),
+        });
+      } else {
+        setCurrentWorkout({ title: "오늘의 운동", exercises: [] });
+      }
+    }
+  };
+
+  // ⭐️ 기록 초기화 기능
+  const handleResetWorkout = () => {
+    if (confirm("현재 작성 중인 운동 목록을 모두 초기화하시겠습니까?\n(저장된 달력 기록은 삭제되지 않으며 복구할 수 없습니다)")) {
+      setCurrentWorkout({ title: "오늘의 운동", exercises: [] });
+      localStorage.removeItem(`gym_draft_${selectedDate}`); // 임시저장 내역도 삭제
+    }
+  };
+
   const handleSaveExercise = () => {
     if (!newExName.trim()) {
       alert("운동 이름을 입력해주세요.");
@@ -294,13 +264,7 @@ export default function GymTracker() {
       setExerciseDb((prev) =>
         prev.map((ex) =>
           ex.id === editingExId
-            ? {
-                ...ex,
-                name: newExName,
-                category: newExCategory,
-                type: newExType,
-                isOneArm: newExIsOneArm,
-              }
+            ? { ...ex, name: newExName, category: newExCategory, type: newExType, isOneArm: newExIsOneArm }
             : ex
         )
       );
@@ -347,10 +311,7 @@ export default function GymTracker() {
     for (const log of workoutLogs) {
       const foundEx = log.exercises.find((e) => e.name === exerciseName);
       if (foundEx && foundEx.sets && foundEx.sets.length > 0) {
-        return foundEx.sets.map((s) => ({
-          ...s,
-          completed: false,
-        }));
+        return foundEx.sets.map((s) => ({ ...s, completed: false }));
       }
     }
 
@@ -374,11 +335,7 @@ export default function GymTracker() {
   const toggleRestDay = (day: string) => {
     setEditingSchedule((prev) => ({
       ...prev,
-      [day]: {
-        ...prev[day],
-        isRest: !prev[day].isRest,
-        exercises: !prev[day].isRest ? [] : prev[day].exercises,
-      },
+      [day]: { ...prev[day], isRest: !prev[day].isRest, exercises: !prev[day].isRest ? [] : prev[day].exercises },
     }));
   };
 
@@ -390,10 +347,7 @@ export default function GymTracker() {
 
     setEditingSchedule((prev) => ({
       ...prev,
-      [day]: {
-        ...prev[day],
-        exercises: [...prev[day].exercises, exerciseToAdd],
-      },
+      [day]: { ...prev[day], exercises: [...prev[day].exercises, exerciseToAdd] },
     }));
   };
 
@@ -401,10 +355,7 @@ export default function GymTracker() {
     setEditingSchedule((prev) => {
       const updatedExercises = [...prev[day].exercises];
       updatedExercises.splice(exIdx, 1);
-      return {
-        ...prev,
-        [day]: { ...prev[day], exercises: updatedExercises },
-      };
+      return { ...prev, [day]: { ...prev[day], exercises: updatedExercises } };
     });
   };
 
@@ -414,15 +365,11 @@ export default function GymTracker() {
       const targetIndex = direction === "up" ? fromIndex - 1 : fromIndex + 1;
 
       if (targetIndex < 0 || targetIndex >= updatedExercises.length) return prev;
-
       const temp = updatedExercises[fromIndex];
       updatedExercises[fromIndex] = updatedExercises[targetIndex];
       updatedExercises[targetIndex] = temp;
 
-      return {
-        ...prev,
-        [day]: { ...prev[day], exercises: updatedExercises },
-      };
+      return { ...prev, [day]: { ...prev[day], exercises: updatedExercises } };
     });
   };
 
@@ -452,9 +399,7 @@ export default function GymTracker() {
     if (editingRoutineId) {
       setRoutines((prev) =>
         prev.map((r) =>
-          r.id === editingRoutineId
-            ? { ...r, name: newRoutineName, schedule: JSON.parse(JSON.stringify(editingSchedule)) }
-            : r
+          r.id === editingRoutineId ? { ...r, name: newRoutineName, schedule: JSON.parse(JSON.stringify(editingSchedule)) } : r
         )
       );
       alert(`'${newRoutineName}' 루틴 수정 완료`);
@@ -467,7 +412,6 @@ export default function GymTracker() {
       setRoutines((prev) => [...prev, created]);
       alert(`'${newRoutineName}' 새 루틴 저장 완료`);
     }
-
     cancelEditRoutine();
   };
 
@@ -487,12 +431,6 @@ export default function GymTracker() {
       return;
     }
 
-    if (currentWorkout.exercises.length > 0) {
-        if(!confirm("현재 작성 중인 목록 아래에 루틴을 추가할까요? (취소 시 덮어쓰기)")) {
-            setCurrentWorkout({ title: `${routine.name} - ${dayOfWeek}`, exercises: [] });
-        }
-    }
-
     const loaded: ExerciseItem[] = todaySchedule.exercises.map((ex) => ({
       name: ex.name,
       category: ex.category || "기타",
@@ -505,16 +443,14 @@ export default function GymTracker() {
       title: prev.exercises.length === 0 ? `${routine.name} - ${dayOfWeek}` : prev.title,
       exercises: [...prev.exercises, ...loaded],
     }));
-
     setActiveTab("log");
   };
 
-  // ⭐️ 과거 운동 기록 불러오기 기능 ⭐️
   const loadPastLogToWorkout = (pastLog: WorkoutLog) => {
       if(confirm(`'${pastLog.date}' 에 진행했던 운동 종목들을 그대로 불러올까요?`)) {
           const loadedExs = pastLog.exercises.map(ex => ({
               ...ex,
-              sets: ex.sets.map(s => ({ ...s, completed: false })) // 불러올 땐 완료 체크 해제
+              sets: ex.sets.map(s => ({ ...s, completed: false }))
           }));
           
           setCurrentWorkout(prev => ({
@@ -556,7 +492,6 @@ export default function GymTracker() {
       const targetIndex = direction === "up" ? fromIndex - 1 : fromIndex + 1;
 
       if (targetIndex < 0 || targetIndex >= updated.length) return prev;
-
       const temp = updated[fromIndex];
       updated[fromIndex] = updated[targetIndex];
       updated[targetIndex] = temp;
@@ -574,16 +509,13 @@ export default function GymTracker() {
         targetSets[setIdx] = { ...targetSets[setIdx], completed: Boolean(val) };
       } else {
         let cleanVal: number | string = val as string;
-
         if (typeof cleanVal === "string") {
           cleanVal = cleanVal.replace(/[^0-9.]/g, "");
-
           const parts = cleanVal.split(".");
           if (parts.length > 2) {
             cleanVal = parts[0] + "." + parts.slice(1).join("");
           }
         }
-
         targetSets[setIdx] = { ...targetSets[setIdx], [field]: cleanVal };
       }
 
@@ -617,33 +549,39 @@ export default function GymTracker() {
       const updated = [...prev.exercises];
       const targetSets = [...updated[exIdx].sets];
       targetSets.splice(setIdx, 1);
-
-      const renumberedSets = targetSets.map((s, idx) => ({
-        ...s,
-        setNumber: idx + 1,
-      }));
-
-      updated[exIdx].sets = renumberedSets;
+      updated[exIdx].sets = targetSets.map((s, idx) => ({ ...s, setNumber: idx + 1 }));
       return { ...prev, exercises: updated };
     });
   };
 
+  // ⭐️ 완료 체크된 운동만 저장되도록 로직 수정 ⭐️
   const saveWorkoutLog = () => {
     if (currentWorkout.exercises.length === 0) {
       alert("기록할 운동 종목이 없습니다.");
       return;
     }
 
-    const cleanedExercises = currentWorkout.exercises.map((ex) => ({
-      ...ex,
-      sets: ex.sets.map((s) => ({
-        ...s,
-        weight: s.weight === "" ? 0 : Number(s.weight),
-        reps: s.reps === "" ? 0 : Number(s.reps),
-        time: s.time === "" ? 0 : Number(s.time),
-        distance: s.distance === "" ? 0 : Number(s.distance),
-      })),
-    }));
+    // 1. 완료된(completed: true) 세트만 골라내기
+    const cleanedExercises = currentWorkout.exercises
+      .map((ex) => {
+        const completedSets = ex.sets.filter(s => s.completed);
+        return {
+          ...ex,
+          sets: completedSets.map((s) => ({
+            ...s,
+            weight: s.weight === "" ? 0 : Number(s.weight),
+            reps: s.reps === "" ? 0 : Number(s.reps),
+            time: s.time === "" ? 0 : Number(s.time),
+            distance: s.distance === "" ? 0 : Number(s.distance),
+          })),
+        };
+      })
+      .filter((ex) => ex.sets.length > 0); // 2. 완료된 세트가 0개면 해당 종목 자체를 제외
+
+    if (cleanedExercises.length === 0) {
+      alert("완료(체크)된 세트가 없습니다.\n운동을 완료 체크한 후 다시 저장해주세요.");
+      return;
+    }
 
     const newLogItem: WorkoutLog = {
       date: selectedDate,
@@ -661,19 +599,18 @@ export default function GymTracker() {
       return [newLogItem, ...prev].sort((a, b) => (a.date < b.date ? 1 : -1));
     });
 
-    alert(`${selectedDate} 운동 기록이 저장되었습니다!`);
+    alert(`${selectedDate} 기록이 달력에 저장되었습니다!\n(※ 완료 체크된 세트만 반영되었습니다)`);
   };
 
   const filteredExercises = exerciseDb.filter((ex) => {
     if (selectedCategoryTab === "전체") return true;
-    if (selectedCategoryTab === "원암 🦾") return ex.isOneArm;
+    if (selectedCategoryTab === "원암/원레그 🦾") return ex.isOneArm;
     return ex.category === selectedCategoryTab;
   });
 
   const renderCalendar = () => {
     const firstDayOfMonth = new Date(calendarYear, calendarMonth, 1).getDay();
     const daysInMonth = new Date(calendarYear, calendarMonth + 1, 0).getDate();
-
     const calendarCells = [];
 
     for (let i = 0; i < firstDayOfMonth; i++) {
@@ -684,7 +621,6 @@ export default function GymTracker() {
       const monthStr = String(calendarMonth + 1).padStart(2, "0");
       const dayStr = String(day).padStart(2, "0");
       const dateKey = `${calendarYear}-${monthStr}-${dayStr}`;
-
       const logForDay = workoutLogs.find((l) => l.date === dateKey);
 
       const categoriesDone = logForDay
@@ -730,8 +666,6 @@ export default function GymTracker() {
   };
 
   const selectedLogDetail = workoutLogs.find((l) => l.date === viewingLogDate);
-
-  // 최근 운동 기록 (최대 7개만 보여주기)
   const recentLogs = [...workoutLogs].sort((a, b) => (a.date < b.date ? 1 : -1)).slice(0, 7);
 
   return (
@@ -744,7 +678,7 @@ export default function GymTracker() {
         <input
           type="date"
           value={selectedDate}
-          onChange={(e) => setSelectedDate(e.target.value)}
+          onChange={handleDateChange} // Date 변경 시 Draft 동기화
           className="bg-slate-900 border border-slate-700 text-slate-200 text-sm rounded px-3 py-1.5"
         />
       </header>
@@ -781,7 +715,6 @@ export default function GymTracker() {
         <section className="space-y-6">
           <div className="bg-slate-900 p-4 rounded-xl border border-slate-800 space-y-4">
             
-            {/* 고정 루틴 불러오기 */}
             <div className="space-y-2">
                 <h3 className="text-xs font-semibold text-slate-400">⚡ 정해둔 루틴에서 불러오기</h3>
                 {routines.length === 0 ? (
@@ -802,7 +735,6 @@ export default function GymTracker() {
                 )}
             </div>
 
-            {/* 과거 기록 불러오기 (새로운 기능) */}
             <div className="space-y-2 border-t border-slate-800 pt-3">
                 <h3 className="text-xs font-semibold text-slate-400">🕒 과거 운동 기록 불러오기 (최근 7일)</h3>
                 {recentLogs.length === 0 ? (
@@ -824,7 +756,6 @@ export default function GymTracker() {
             </div>
           </div>
 
-          {/* 🔍 종목 추가 영역 (부위별 필터 적용) */}
           <div className="bg-slate-900 p-4 rounded-xl border border-slate-800 space-y-3">
             <div className="flex justify-between items-center">
               <h3 className="text-sm font-semibold text-slate-300">🔍 종목 추가하기</h3>
@@ -836,7 +767,6 @@ export default function GymTracker() {
               </button>
             </div>
 
-            {/* 부위 필터 탭 */}
             <div className="flex gap-1 overflow-x-auto pb-1">
               {CATEGORIES.map((cat) => (
                 <button
@@ -851,7 +781,6 @@ export default function GymTracker() {
               ))}
             </div>
 
-            {/* 필터링된 드롭다운 (텍스트 태그 반영) */}
             <select
               onChange={(e) => {
                 if (e.target.value) {
@@ -866,29 +795,37 @@ export default function GymTracker() {
               </option>
               {filteredExercises.map((ex) => (
                 <option key={ex.id} value={ex.name}>
-                  [{ex.category}] {getTagString(ex.name, ex.isOneArm)} {cleanName(ex.name)} {ex.isCustom ? "★" : ""}
+                  [{ex.category}] {getTagString(ex.name, ex.isOneArm, ex.category)} {cleanName(ex.name)} {ex.isCustom ? "★" : ""}
                 </option>
               ))}
             </select>
           </div>
 
           <div className="space-y-4">
+            {/* ⭐️ 기록 초기화 버튼 영역 ⭐️ */}
             <div className="flex justify-between items-center px-1">
               <span className="text-xs text-slate-400 font-semibold">
                 선택된 날짜: <span className="text-blue-400 font-bold">{selectedDate}</span>
               </span>
+              <button
+                onClick={handleResetWorkout}
+                className="text-xs bg-red-900/40 hover:bg-red-800/60 text-red-300 px-2.5 py-1 rounded border border-red-800/50 font-bold transition-colors"
+              >
+                🗑️ 기록 초기화
+              </button>
             </div>
 
             {currentWorkout.exercises.length === 0 ? (
               <div className="text-center py-12 text-slate-500 bg-slate-900/40 rounded-xl border border-dashed border-slate-800">
-                종목을 추가하거나 루틴을 불러와 기록을 작성하세요.
+                종목을 추가하거나 루틴을 불러와 기록을 작성하세요.<br/>
+                <span className="text-xs">(작성 중인 내용은 자동 저장됩니다)</span>
               </div>
             ) : (
               currentWorkout.exercises.map((ex, exIdx) => {
                 const exType = ex.type || "weight";
 
                 return (
-                  <div key={exIdx} className="bg-slate-900 p-4 rounded-xl border border-slate-800 space-y-3">
+                  <div key={exIdx} className="bg-slate-900 p-4 rounded-xl border border-slate-800 space-y-3 shadow-sm">
                     <div className="flex justify-between items-center">
                       <div className="flex items-center gap-2 flex-wrap">
                         <div className="flex flex-col gap-0.5">
@@ -912,7 +849,6 @@ export default function GymTracker() {
                           {ex.category}
                         </span>
                         
-                        {/* ⭐️ 이름 앞에 직관적인 태그 렌더링 ⭐️ */}
                         <div className="flex items-center">
                             {renderTags(ex)}
                             <h4 className="font-bold text-slate-100">{cleanName(ex.name)}</h4>
@@ -1028,7 +964,7 @@ export default function GymTracker() {
               onClick={saveWorkoutLog}
               className="w-full py-3 bg-emerald-600 hover:bg-emerald-500 font-bold text-white rounded-xl shadow-lg"
             >
-              💾 {selectedDate} 운동 기록 저장
+              💾 {selectedDate} 달력에 기록 저장 (완료된 세트만)
             </button>
           )}
         </section>
@@ -1090,7 +1026,7 @@ export default function GymTracker() {
                           <option value="">+ {day} 운동 종목 추가</option>
                           {exerciseDb.map((ex) => (
                             <option key={ex.id} value={ex.name}>
-                              [{ex.category}] {getTagString(ex.name, ex.isOneArm)} {cleanName(ex.name)}
+                              [{ex.category}] {getTagString(ex.name, ex.isOneArm, ex.category)} {cleanName(ex.name)}
                             </option>
                           ))}
                         </select>
@@ -1300,7 +1236,6 @@ export default function GymTracker() {
             </div>
 
             <div className="p-4 overflow-y-auto space-y-5">
-              {/* 종목 생성/수정 입력폼 */}
               <div className="bg-slate-800/80 p-3.5 rounded-xl border border-slate-700 space-y-3">
                 <h4 className="text-xs font-bold text-blue-400">
                   {editingExId ? "✏️ 선택한 종목 수정" : "➕ 새 커스텀 종목 생성"}
@@ -1323,7 +1258,7 @@ export default function GymTracker() {
                         onChange={(e) => setNewExCategory(e.target.value)}
                         className="w-full bg-slate-900 border border-slate-700 rounded p-2 text-xs text-slate-200"
                       >
-                        {CATEGORIES.filter((c) => c !== "전체" && c !== "원암 🦾").map((cat) => (
+                        {CATEGORIES.filter((c) => c !== "전체" && c !== "원암/원레그 🦾").map((cat) => (
                           <option key={cat} value={cat}>
                             {cat}
                           </option>
@@ -1377,7 +1312,6 @@ export default function GymTracker() {
                 </div>
               </div>
 
-              {/* 전체 종목 데이터 리스트 (수정/삭제) */}
               <div className="space-y-2">
                 <h4 className="text-xs font-bold text-slate-400">
                   전체 등록 종목 목록 ({exerciseDb.length}개)
@@ -1393,7 +1327,7 @@ export default function GymTracker() {
                           {ex.category}
                         </span>
                         <span className="font-semibold text-slate-200">
-                           {getTagString(ex.name, ex.isOneArm)} {cleanName(ex.name)}
+                           {getTagString(ex.name, ex.isOneArm, ex.category)} {cleanName(ex.name)}
                         </span>
                       </div>
 
