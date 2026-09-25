@@ -81,6 +81,15 @@ interface WorkoutLog {
   exercises: ExerciseItem[];
 }
 
+// ─── 날짜 유틸 함수 (로컬 타임존 기준 YYYY-MM-DD 생성) ───
+const getTodayString = () => {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, "0");
+  const day = String(now.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+};
+
 const renderTags = (ex: { name: string; isOneArm: boolean; category: string }) => {
   const tags = [];
   if (ex.isOneArm) {
@@ -120,9 +129,7 @@ export default function GymTracker() {
   const [activeTab, setActiveTab] = useState<"log" | "routine" | "history">("log");
   const [selectedCategoryTab, setSelectedCategoryTab] = useState<string>("전체");
   
-  const [selectedDate, setSelectedDate] = useState<string>(
-    new Date().toISOString().split("T")[0]
-  );
+  const [selectedDate, setSelectedDate] = useState<string>(getTodayString());
 
   const [exerciseDb, setExerciseDb] = useState<ExerciseDef[]>(INITIAL_EXERCISE_DATABASE);
   const [isManageModalOpen, setIsManageModalOpen] = useState(false);
@@ -158,7 +165,7 @@ export default function GymTracker() {
     }, {} as Record<string, DaySchedule>)
   );
 
-  // ─── 1. 로컬 스토리지에서 데이터 불러오기 (DB 통신 제거) ───
+  // ─── 1. 로컬 스토리지에서 데이터 불러오기 ───
   useEffect(() => {
     const loadData = () => {
       try {
@@ -171,8 +178,8 @@ export default function GymTracker() {
           if (data.routines) setRoutines(data.routines);
           if (data.logs) {
             setWorkoutLogs(data.logs);
-            const initialDate = new Date().toISOString().split("T")[0];
-            const existingLog = data.logs.find((l: WorkoutLog) => l.date === initialDate);
+            const todayStr = getTodayString();
+            const existingLog = data.logs.find((l: WorkoutLog) => l.date === todayStr);
             if (existingLog) {
               setCurrentWorkout({
                 title: existingLog.title,
@@ -408,7 +415,8 @@ export default function GymTracker() {
   };
 
   const loadRoutineToLog = (routine: WeeklyRoutine) => {
-    const dayOfWeek = new Date(selectedDate).toLocaleDateString("ko-KR", { weekday: "long" });
+    const targetDateObj = new Date(`${selectedDate}T00:00:00`);
+    const dayOfWeek = targetDateObj.toLocaleDateString("ko-KR", { weekday: "long" });
     const todaySchedule = routine.schedule[dayOfWeek] || routine.schedule["월요일"];
 
     if (todaySchedule.isRest) {
@@ -700,7 +708,6 @@ export default function GymTracker() {
       {activeTab === "log" && (
         <section className="space-y-6">
           <div className="bg-slate-900 p-4 rounded-xl border border-slate-800 space-y-4">
-            
             <div className="space-y-2">
                 <h3 className="text-xs font-semibold text-slate-400">⚡ 정해둔 루틴에서 불러오기</h3>
                 {routines.length === 0 ? (
