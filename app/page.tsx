@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { UserButton } from "@clerk/nextjs";
 
 export type ExerciseType = "weight" | "bodyweight" | "cardio";
 
@@ -165,31 +166,36 @@ export default function GymTracker() {
     }, {} as Record<string, DaySchedule>)
   );
 
-  // ─── 1. 로컬 스토리지에서 데이터 불러오기 ───
+  // ─── 1. 서버(Neon DB)에서 데이터 불러오기 ───
   useEffect(() => {
-    const loadData = () => {
+    const loadData = async () => {
       try {
-        const savedData = localStorage.getItem("gymTrackerData");
-        if (savedData) {
-          const data = JSON.parse(savedData);
-          if (data.exerciseDb && data.exerciseDb.length > 0) {
-            setExerciseDb(data.exerciseDb);
-          }
-          if (data.routines) setRoutines(data.routines);
-          if (data.logs) {
-            setWorkoutLogs(data.logs);
-            const todayStr = getTodayString();
-            const existingLog = data.logs.find((l: WorkoutLog) => l.date === todayStr);
-            if (existingLog) {
-              setCurrentWorkout({
-                title: existingLog.title,
-                exercises: JSON.parse(JSON.stringify(existingLog.exercises)),
-              });
-            }
+        const res = await fetch("/api/gym-data");
+        if (res.status === 401) {
+          console.warn("로그인이 필요합니다.");
+          return;
+        }
+        if (!res.ok) throw new Error("서버 응답 오류");
+
+        const data = await res.json();
+        if (data.exerciseDb && data.exerciseDb.length > 0) {
+          setExerciseDb(data.exerciseDb);
+        }
+        if (data.routines) setRoutines(data.routines);
+        if (data.logs) {
+          setWorkoutLogs(data.logs);
+          const todayStr = getTodayString();
+          const existingLog = data.logs.find((l: WorkoutLog) => l.date === todayStr);
+          if (existingLog) {
+            setCurrentWorkout({
+              title: existingLog.title,
+              exercises: JSON.parse(JSON.stringify(existingLog.exercises)),
+            });
           }
         }
       } catch (error) {
         console.error("데이터 로드 실패:", error);
+        alert("서버에서 데이터를 불러오지 못했습니다. 새로고침 해주세요.");
       } finally {
         setIsLoaded(true);
       }
@@ -197,23 +203,21 @@ export default function GymTracker() {
     loadData();
   }, []);
 
-  // ─── 2. 데이터 변경 시 로컬 스토리지로 자동 저장 ───
-  const syncToLocal = (updatedData: {
+  // ─── 2. 데이터 변경 시 서버(Neon DB)로 저장 ───
+  const syncToServer = (updatedData: {
     exerciseDb?: ExerciseDef[];
     routines?: WeeklyRoutine[];
     logs?: WorkoutLog[];
   }) => {
     if (!isLoaded) return;
-    try {
-      const dataToSave = {
-        exerciseDb: updatedData.exerciseDb ?? exerciseDb,
-        routines: updatedData.routines ?? routines,
-        logs: updatedData.logs ?? workoutLogs,
-      };
-      localStorage.setItem("gymTrackerData", JSON.stringify(dataToSave));
-    } catch (error) {
-      console.error("로컬 저장 실패:", error);
-    }
+    fetch("/api/gym-data", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(updatedData),
+    }).catch((error) => {
+      console.error("서버 저장 실패:", error);
+      alert("서버 저장에 실패했습니다. 네트워크 연결을 확인하고 다시 시도해주세요.");
+    });
   };
 
   const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -266,7 +270,7 @@ export default function GymTracker() {
       alert("새 운동 종목이 추가되었습니다.");
     }
 
-    syncToLocal({ exerciseDb: updatedDb });
+    syncToServer({ exerciseDb: updatedDb });
     resetExForm();
   };
 
@@ -282,7 +286,7 @@ export default function GymTracker() {
     if (confirm("정말 이 운동 종목을 삭제하시겠습니까?")) {
       const updatedDb = exerciseDb.filter((ex) => ex.id !== id);
       setExerciseDb(updatedDb);
-      syncToLocal({ exerciseDb: updatedDb });
+      syncToServer({ exerciseDb: updatedDb });
     }
   };
 
@@ -401,7 +405,7 @@ export default function GymTracker() {
       alert(`'${newRoutineName}' 새 루틴 저장 완료`);
     }
 
-    syncToLocal({ routines: updatedRoutines });
+    syncToServer({ routines: updatedRoutines });
     cancelEditRoutine();
   };
 
@@ -409,7 +413,7 @@ export default function GymTracker() {
     if (confirm("해당 루틴을 삭제하시겠습니까?")) {
       const updatedRoutines = routines.filter((r) => r.id !== id);
       setRoutines(updatedRoutines);
-      syncToLocal({ routines: updatedRoutines });
+      syncToServer({ routines: updatedRoutines });
       if (editingRoutineId === id) cancelEditRoutine();
     }
   };
@@ -591,9 +595,9 @@ export default function GymTracker() {
     })();
 
     setWorkoutLogs(updatedLogs);
-    syncToLocal({ logs: updatedLogs });
+    syncToServer({ logs: updatedLogs });
 
-    alert(`${selectedDate} 기록이 내 기기에 안전하게 저장되었습니다!\n(※ 완료 체크된 세트만 반영되었습니다)`);
+    alert(`${selectedDate} 기록이 서버에 안전하게 저장되었습니다!\n(※ 완료 체크된 세트만 반영되었습니다)`);
   };
 
   const filteredExercises = exerciseDb.filter((ex) => {
@@ -665,9 +669,12 @@ export default function GymTracker() {
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 p-4 max-w-2xl mx-auto">
       <header className="flex justify-between items-center mb-6 pb-4 border-b border-slate-800">
-        <div>
-          <h1 className="text-2xl font-bold text-blue-500">⚡ GYM TRACKER</h1>
-          <p className="text-xs text-slate-400">부위별 종목 선택 & 커스텀 운동 관리</p>
+        <div className="flex items-center gap-3">
+          <UserButton />
+          <div>
+            <h1 className="text-2xl font-bold text-blue-500">⚡ GYM TRACKER</h1>
+            <p className="text-xs text-slate-400">부위별 종목 선택 & 커스텀 운동 관리</p>
+          </div>
         </div>
         <input
           type="date"
