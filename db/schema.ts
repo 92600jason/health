@@ -1,40 +1,19 @@
-import { pgTable, serial, text, integer, timestamp, boolean, uuid } from "drizzle-orm/pg-core";
+import { pgTable, text, jsonb, timestamp } from "drizzle-orm/pg-core";
 
-// 1. 유저 테이블
+// 1. 유저 테이블 — id는 Clerk의 userId를 그대로 사용 (예: "user_2abc...")
 export const users = pgTable("users", {
-  id: uuid("id").defaultRandom().primaryKey(),
-  email: text("email").notNull().unique(),
+  id: text("id").primaryKey(),
+  email: text("email"),
   createdAt: timestamp("created_at").defaultNow(),
 });
 
-// 2. 운동 기록 메인 테이블 (userId 추가)
-export const workouts = pgTable("workouts", {
-  id: serial("id").primaryKey(),
-  userId: uuid("user_id").references(() => users.id, { onDelete: "cascade" }), // 로그인 유저 ID
-  date: text("date").notNull(), // YYYY-MM-DD
-  title: text("title").notNull(),
-  routineName: text("routine_name"),
-  createdAt: timestamp("created_at").defaultNow(),
-});
-
-// 3. 운동 세트 상세 테이블
-export const workoutSets = pgTable("workout_sets", {
-  id: serial("id").primaryKey(),
-  workoutId: integer("workout_id").references(() => workouts.id, { onDelete: "cascade" }),
-  exerciseName: text("exercise_name").notNull(),
-  category: text("category").notNull(),
-  isOneArm: boolean("is_one_arm").default(false), // 원암 운동 여부
-  setNumber: integer("set_number").notNull(),
-  weight: integer("weight").default(0),
-  reps: integer("reps").default(0),
-  completed: boolean("completed").default(false),
-});
-
-// 4. 사용자 정의 루틴 테이블 (userId 추가)
-export const routines = pgTable("routines", {
-  id: serial("id").primaryKey(),
-  userId: uuid("user_id").references(() => users.id, { onDelete: "cascade" }), // 로그인 유저 ID
-  name: text("name").notNull(),
-  targetDay: text("target_day"),
-  exercises: text("exercises").notNull(), // JSON stringify 데이터
+// 2. 헬스 기록 전체를 JSON 덩어리로 저장하는 테이블 (유저 1명당 1행)
+export const gymData = pgTable("gym_data", {
+  userId: text("user_id")
+    .primaryKey()
+    .references(() => users.id, { onDelete: "cascade" }),
+  exerciseDb: jsonb("exercise_db").notNull().default([]),
+  routines: jsonb("routines").notNull().default([]),
+  logs: jsonb("logs").notNull().default([]),
+  updatedAt: timestamp("updated_at").defaultNow(),
 });
