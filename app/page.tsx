@@ -31,7 +31,7 @@ const INITIAL_EXERCISE_DATABASE: ExerciseDef[] = [
   { id: "ex_34", name: "바벨 오버헤드 프레스 (OHP)", category: "어깨", isOneArm: false, type: "weight" },
   { id: "ex_36", name: "덤벨 숄더 프레스", category: "어깨", isOneArm: false, type: "weight" },
   { id: "ex_39", name: "덤벨 사이드 레이터럴 레이즈", category: "어깨", isOneArm: false, type: "weight" },
-  { id: "ex_45", name: "케이블 페이스풀", category: "후면어깨", isOneArm: false, type: "weight" },
+  { id: "ex_45", name: "케이블 페이스풀", category: "어깨", isOneArm: false, type: "weight" },
   { id: "ex_47", name: "바벨 백스쿼트", category: "하체", isOneArm: false, type: "weight" },
   { id: "ex_54", name: "레그 프레스", category: "하체", isOneArm: false, type: "weight" },
   { id: "ex_56", name: "레그 익스텐션", category: "하체", isOneArm: false, type: "weight" },
@@ -44,8 +44,11 @@ const INITIAL_EXERCISE_DATABASE: ExerciseDef[] = [
   { id: "ex_83", name: "런닝머신 (인클라인)", category: "유산소", isOneArm: false, type: "cardio" },
 ];
 
+// 예전에 쓰던 '후면어깨' 분류는 '어깨'로 통합 (불러올 때 자동 변환)
+const normalizeCategory = (c: string) => (c === "후면어깨" ? "어깨" : c);
+
 const DAYS = ["월요일", "화요일", "수요일", "목요일", "금요일", "토요일", "일요일"];
-const CATEGORIES = ["전체", "가슴", "등", "어깨", "후면어깨", "하체", "복근", "이두", "삼두", "유산소", "원암/원레그 🦾"];
+const CATEGORIES = ["전체", "가슴", "등", "어깨", "하체", "복근", "이두", "삼두", "유산소", "원암/원레그 🦾"];
 
 interface SetItem {
   setNumber: number;
@@ -81,6 +84,21 @@ interface WorkoutLog {
   title: string;
   exercises: ExerciseItem[];
 }
+
+const normalizeRoutine = (r: WeeklyRoutine): WeeklyRoutine => ({
+  ...r,
+  schedule: Object.fromEntries(
+    Object.entries(r.schedule ?? {}).map(([day, d]) => [
+      day,
+      { ...d, exercises: (d.exercises ?? []).map((e) => ({ ...e, category: normalizeCategory(e.category) })) },
+    ])
+  ),
+});
+
+const normalizeLog = (l: WorkoutLog): WorkoutLog => ({
+  ...l,
+  exercises: (l.exercises ?? []).map((e) => ({ ...e, category: normalizeCategory(e.category) })),
+});
 
 // ─── 날짜 유틸 함수 (로컬 타임존 기준 YYYY-MM-DD 생성) ───
 const getTodayString = () => {
@@ -179,13 +197,16 @@ export default function GymTracker() {
 
         const data = await res.json();
         if (data.exerciseDb && data.exerciseDb.length > 0) {
-          setExerciseDb(data.exerciseDb);
+          setExerciseDb(
+            data.exerciseDb.map((e: ExerciseDef) => ({ ...e, category: normalizeCategory(e.category) }))
+          );
         }
-        if (data.routines) setRoutines(data.routines);
+        if (data.routines) setRoutines(data.routines.map(normalizeRoutine));
         if (data.logs) {
-          setWorkoutLogs(data.logs);
+          const logs: WorkoutLog[] = data.logs.map(normalizeLog);
+          setWorkoutLogs(logs);
           const todayStr = getTodayString();
-          const existingLog = data.logs.find((l: WorkoutLog) => l.date === todayStr);
+          const existingLog = logs.find((l) => l.date === todayStr);
           if (existingLog) {
             setCurrentWorkout({
               title: existingLog.title,
@@ -265,7 +286,7 @@ export default function GymTracker() {
         isOneArm: newExIsOneArm,
         isCustom: true,
       };
-      updatedDb = [created, ...exerciseDb];
+      updatedDb = [...exerciseDb, created];
       setExerciseDb(updatedDb);
       alert("새 운동 종목이 추가되었습니다.");
     }
@@ -443,18 +464,30 @@ export default function GymTracker() {
     setActiveTab("log");
   };
 
-  const loadPastLogToWorkout = (pastLog: WorkoutLog) => {
-    if(confirm(`'${pastLog.date}' 에 진행했던 운동 종목들을 그대로 불러올까요?`)) {
-      const loadedExs = pastLog.exercises.map(ex => ({
-        ...ex,
-        sets: ex.sets.map(s => ({ ...s, completed: false }))
-      }));
-      
-      setCurrentWorkout(prev => ({
-        title: prev.title === "오늘의 운동" ? pastLog.title : prev.title,
-        exercises: [...prev.exercises, ...loadedExs]
-      }));
-    }
+  // 기록 달력에서 본 과거 운동을 '오늘' 운동으로 가져오기 (세트 완료 체크는 해제)
+  const importLogToToday = (pastLog: WorkoutLog) => {
+    const today = getTodayString();
+    if (!confirm(`'${pastLog.date}' 운동을 오늘(${today}) 운동으로 가져올까요?`)) return;
+
+    const loadedExs = pastLog.exercises.map((ex) => ({
+      ...ex,
+      sets: ex.sets.map((s) => ({ ...s, completed: false })),
+    }));
+
+    const todayLog = workoutLogs.find((l) => l.date === today);
+    const base =
+      selectedDate === today
+        ? currentWorkout
+        : todayLog
+        ? { title: todayLog.title, exercises: JSON.parse(JSON.stringify(todayLog.exercises)) }
+        : { title: "오늘의 운동", exercises: [] };
+
+    setSelectedDate(today);
+    setCurrentWorkout({
+      title: base.title === "오늘의 운동" ? pastLog.title : base.title,
+      exercises: [...base.exercises, ...loadedExs],
+    });
+    setActiveTab("log");
   };
 
   const addExerciseToWorkout = (exName: string) => {
@@ -600,11 +633,18 @@ export default function GymTracker() {
     alert(`${selectedDate} 기록이 서버에 안전하게 저장되었습니다!\n(※ 완료 체크된 세트만 반영되었습니다)`);
   };
 
-  const filteredExercises = exerciseDb.filter((ex) => {
-    if (selectedCategoryTab === "전체") return true;
-    if (selectedCategoryTab === "원암/원레그 🦾") return ex.isOneArm;
-    return ex.category === selectedCategoryTab;
-  });
+  // 커스텀/기본 종목 구분 없이 부위 순서대로 정렬 (같은 부위 안에서는 기존 순서 유지)
+  const categoryOrder = (c: string) => {
+    const i = CATEGORIES.indexOf(c);
+    return i === -1 ? CATEGORIES.length : i;
+  };
+  const filteredExercises = exerciseDb
+    .filter((ex) => {
+      if (selectedCategoryTab === "전체") return true;
+      if (selectedCategoryTab === "원암/원레그 🦾") return ex.isOneArm;
+      return ex.category === selectedCategoryTab;
+    })
+    .sort((a, b) => categoryOrder(a.category) - categoryOrder(b.category));
 
   const renderCalendar = () => {
     const firstDayOfMonth = new Date(calendarYear, calendarMonth, 1).getDay();
@@ -664,7 +704,6 @@ export default function GymTracker() {
   };
 
   const selectedLogDetail = workoutLogs.find((l) => l.date === viewingLogDate);
-  const recentLogs = [...workoutLogs].sort((a, b) => (a.date < b.date ? 1 : -1)).slice(0, 7);
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 p-4 max-w-2xl mx-auto">
@@ -734,26 +773,6 @@ export default function GymTracker() {
                 </div>
                 )}
             </div>
-
-            <div className="space-y-2 border-t border-slate-800 pt-3">
-                <h3 className="text-xs font-semibold text-slate-400">🕒 과거 운동 기록 불러오기 (최근 7일)</h3>
-                {recentLogs.length === 0 ? (
-                <p className="text-xs text-slate-500 py-1">아직 저장된 운동 기록이 없습니다.</p>
-                ) : (
-                <div className="flex gap-2 overflow-x-auto pb-1">
-                    {recentLogs.map((log) => (
-                    <button
-                        key={log.date}
-                        onClick={() => loadPastLogToWorkout(log)}
-                        className="bg-slate-800/80 hover:bg-purple-900/40 border border-slate-700 text-xs px-3 py-2 rounded-lg text-left whitespace-nowrap"
-                    >
-                        <div className="font-bold text-slate-200">{log.date}</div>
-                        <div className="text-[10px] text-purple-400">조합 그대로 복사 ➔</div>
-                    </button>
-                    ))}
-                </div>
-                )}
-            </div>
           </div>
 
           <div className="bg-slate-900 p-4 rounded-xl border border-slate-800 space-y-3">
@@ -795,7 +814,7 @@ export default function GymTracker() {
               </option>
               {filteredExercises.map((ex) => (
                 <option key={ex.id} value={ex.name}>
-                  [{ex.category}] {getTagString(ex.name, ex.isOneArm, ex.category)} {cleanName(ex.name)} {ex.isCustom ? "★" : ""}
+                  [{ex.category}] {getTagString(ex.name, ex.isOneArm, ex.category)} {cleanName(ex.name)}
                 </option>
               ))}
             </select>
@@ -1158,15 +1177,25 @@ export default function GymTracker() {
                 <h4 className="font-bold text-slate-100">
                   📅 {viewingLogDate} 운동 상세
                 </h4>
-                <button
-                  onClick={() => {
-                    setSelectedDate(viewingLogDate);
-                    setActiveTab("log");
-                  }}
-                  className="bg-blue-600 text-white text-xs px-2.5 py-1 rounded font-bold"
-                >
-                  수정하러 가기 ➔
-                </button>
+                <div className="flex gap-2">
+                  {selectedLogDetail && (
+                    <button
+                      onClick={() => importLogToToday(selectedLogDetail)}
+                      className="bg-purple-600 text-white text-xs px-2.5 py-1 rounded font-bold"
+                    >
+                      🔁 오늘 운동으로 가져오기
+                    </button>
+                  )}
+                  <button
+                    onClick={() => {
+                      setSelectedDate(viewingLogDate);
+                      setActiveTab("log");
+                    }}
+                    className="bg-blue-600 text-white text-xs px-2.5 py-1 rounded font-bold"
+                  >
+                    수정하러 가기 ➔
+                  </button>
+                </div>
               </div>
 
               {!selectedLogDetail ? (
