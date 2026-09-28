@@ -19,33 +19,113 @@ const INITIAL_EXERCISE_DATABASE: ExerciseDef[] = [
   { id: "ex_1", name: "바벨 벤치프레스", category: "가슴", isOneArm: false, type: "weight" },
   { id: "ex_2", name: "덤벨 벤치프레스", category: "가슴", isOneArm: false, type: "weight" },
   { id: "ex_3", name: "스미스 머신 벤치프레스", category: "가슴", isOneArm: false, type: "weight" },
+  { id: "ex_4", name: "체스트 프레스 머신", category: "가슴", isOneArm: false, type: "weight" },
+  { id: "ex_5", name: "바벨 인클라인 벤치프레스", category: "가슴", isOneArm: false, type: "weight" },
+  { id: "ex_6", name: "덤벨 인클라인 벤치프레스", category: "가슴", isOneArm: false, type: "weight" },
+  { id: "ex_7", name: "인클라인 체스트 프레스 머신", category: "가슴", isOneArm: false, type: "weight" },
+  { id: "ex_8", name: "덤벨 디클라인 벤치프레스", category: "가슴", isOneArm: false, type: "weight" },
   { id: "ex_9", name: "덤벨 체스트 플라이", category: "가슴", isOneArm: false, type: "weight" },
+  { id: "ex_10", name: "펙덱 플라이 머신", category: "가슴", isOneArm: false, type: "weight" },
   { id: "ex_11", name: "케이블 체스트 플라이", category: "가슴", isOneArm: false, type: "weight" },
+  { id: "ex_12", name: "케이블 하이투로우 플라이", category: "가슴", isOneArm: false, type: "weight" },
+  { id: "ex_13", name: "케이블 로우투하이 플라이", category: "가슴", isOneArm: false, type: "weight" },
+  { id: "ex_14", name: "딥스 (가슴 자극)", category: "가슴", isOneArm: false, type: "bodyweight" },
   { id: "ex_15", name: "푸쉬업 (팔굽혀펴기)", category: "가슴", isOneArm: false, type: "bodyweight" },
   { id: "ex_16", name: "풀업 (맨몸 턱걸이)", category: "등", isOneArm: false, type: "bodyweight" },
+  { id: "ex_17", name: "어시스트 풀업 머신", category: "등", isOneArm: false, type: "weight" },
   { id: "ex_18", name: "렛풀다운 (오버그립)", category: "등", isOneArm: false, type: "weight" },
+  { id: "ex_19", name: "렛풀다운 (언더그립)", category: "등", isOneArm: false, type: "weight" },
+  { id: "ex_20", name: "클로즈그립 렛풀다운", category: "등", isOneArm: false, type: "weight" },
+  { id: "ex_21", name: "와이드그립 렛풀다운", category: "등", isOneArm: false, type: "weight" },
   { id: "ex_22", name: "컨벤셔널 데드리프트", category: "등", isOneArm: false, type: "weight" },
+  { id: "ex_23", name: "루마니안 데드리프트", category: "등", isOneArm: false, type: "weight" },
+  { id: "ex_24", name: "렉풀 (Rack Pull)", category: "등", isOneArm: false, type: "weight" },
   { id: "ex_25", name: "바벨로우", category: "등", isOneArm: false, type: "weight" },
+  { id: "ex_26", name: "펜들레이 로우", category: "등", isOneArm: false, type: "weight" },
+  { id: "ex_27", name: "덤벨로우", category: "등", isOneArm: false, type: "weight" },
   { id: "ex_28", name: "원암 덤벨로우", category: "등", isOneArm: true, type: "weight" },
-  { id: "ex_29", name: "시티드 케이블로우", category: "등", isOneArm: false, type: "weight" },
-  { id: "ex_34", name: "바벨 오버헤드 프레스 (OHP)", category: "어깨", isOneArm: false, type: "weight" },
-  { id: "ex_36", name: "덤벨 숄더 프레스", category: "어깨", isOneArm: false, type: "weight" },
-  { id: "ex_39", name: "덤벨 사이드 레이터럴 레이즈", category: "어깨", isOneArm: false, type: "weight" },
-  { id: "ex_45", name: "케이블 페이스풀", category: "어깨", isOneArm: false, type: "weight" },
+  { id: "ex_29", name: "시티드 케이블로우 (V바)", category: "등", isOneArm: false, type: "weight" },
+  { id: "ex_30", name: "시티드 케이블로우 (와이드바)", category: "등", isOneArm: false, type: "weight" },
+  { id: "ex_31", name: "T바 로우", category: "등", isOneArm: false, type: "weight" },
+  { id: "ex_32", name: "암 풀다운 (케이블)", category: "등", isOneArm: false, type: "weight" },
+  { id: "ex_33", name: "백 익스텐션", category: "등", isOneArm: false, type: "bodyweight" },
+  { id: "custom_1788873670783", name: "케이블 렛풀다운", category: "등", isOneArm: false, type: "weight" },
+  { id: "custom_1788874214967", name: "[원암] 케이블 로우", category: "등", isOneArm: true, type: "weight" },
+  { id: "custom_1789707311529", name: "시티드 로우", category: "등", isOneArm: true, type: "weight" },
+  { id: "ex_34", name: "[전면] 바벨 오버헤드 프레스 (OHP)", category: "어깨", isOneArm: false, type: "weight" },
+  { id: "ex_35", name: "[전면] 스미스 머신 숄더 프레스", category: "어깨", isOneArm: false, type: "weight" },
+  { id: "ex_36", name: "[전면] 덤벨 숄더 프레스", category: "어깨", isOneArm: false, type: "weight" },
+  { id: "ex_37", name: "[전면] 아놀드 프레스", category: "어깨", isOneArm: false, type: "weight" },
+  { id: "ex_38", name: "[전면] 숄더 프레스 머신", category: "어깨", isOneArm: false, type: "weight" },
+  { id: "ex_39", name: "[측면] 덤벨 사이드 레이터럴 레이즈", category: "어깨", isOneArm: false, type: "weight" },
+  { id: "ex_40", name: "[측면] 케이블 사이드 레이터럴 레이즈", category: "어깨", isOneArm: false, type: "weight" },
+  { id: "ex_41", name: "[측면] 머신 사이드 레이터럴 레이즈", category: "어깨", isOneArm: false, type: "weight" },
+  { id: "ex_42", name: "[측면] 업라이트 로우", category: "어깨", isOneArm: false, type: "weight" },
+  { id: "ex_43", name: "[후면] 덤벨 리버스 플라이", category: "어깨", isOneArm: false, type: "weight" },
+  { id: "ex_44", name: "[후면] 리버스 펙덱 플라이 머신", category: "어깨", isOneArm: false, type: "weight" },
+  { id: "ex_45", name: "[후면] 케이블 페이스풀", category: "어깨", isOneArm: false, type: "weight" },
+  { id: "ex_46", name: "[후면] 벤트오버 레이터럴 레이즈", category: "어깨", isOneArm: false, type: "weight" },
+  { id: "custom_1788788186084", name: "[측면] 스미스 숄더 프레스", category: "어깨", isOneArm: false, type: "weight" },
+  { id: "custom_1789998528510", name: "케이블 후면  리버스 플라이", category: "어깨", isOneArm: true, type: "weight" },
   { id: "ex_47", name: "바벨 백스쿼트", category: "하체", isOneArm: false, type: "weight" },
+  { id: "ex_48", name: "바벨 프론트 스쿼트", category: "하체", isOneArm: false, type: "weight" },
+  { id: "ex_49", name: "스미스 머신 스쿼트", category: "하체", isOneArm: false, type: "weight" },
+  { id: "ex_50", name: "핵 스쿼트 머신", category: "하체", isOneArm: false, type: "weight" },
+  { id: "ex_51", name: "덤벨 레귤러 스쿼트", category: "하체", isOneArm: false, type: "weight" },
+  { id: "ex_52", name: "덤벨 와이드 스쿼트", category: "하체", isOneArm: false, type: "weight" },
+  { id: "ex_53", name: "덤벨 고블렛 스쿼트", category: "하체", isOneArm: false, type: "weight" },
   { id: "ex_54", name: "레그 프레스", category: "하체", isOneArm: false, type: "weight" },
+  { id: "ex_55", name: "파워 레그 프레스", category: "하체", isOneArm: false, type: "weight" },
   { id: "ex_56", name: "레그 익스텐션", category: "하체", isOneArm: false, type: "weight" },
+  { id: "ex_57", name: "라잉 레그 컬", category: "하체", isOneArm: false, type: "weight" },
+  { id: "ex_58", name: "시티드 레그 컬", category: "하체", isOneArm: false, type: "weight" },
+  { id: "ex_59", name: "스티프 레그 데드리프트", category: "하체", isOneArm: false, type: "weight" },
   { id: "ex_60", name: "덤벨 런지", category: "하체", isOneArm: true, type: "weight" },
   { id: "ex_61", name: "불가리안 스플릿 스쿼트", category: "하체", isOneArm: true, type: "weight" },
-  { id: "ex_65", name: "바벨 컬", category: "이두", isOneArm: false, type: "weight" },
-  { id: "ex_72", name: "케이블 푸쉬다운", category: "삼두", isOneArm: false, type: "weight" },
+  { id: "ex_62", name: "바벨 힙 쓰러스터", category: "하체", isOneArm: false, type: "weight" },
+  { id: "ex_63", name: "이너싸이 (아웃타이/이너타이)", category: "하체", isOneArm: false, type: "weight" },
+  { id: "ex_64", name: "카프 레이즈", category: "하체", isOneArm: false, type: "weight" },
+  { id: "custom_1788324594246", name: "레그 익스텐션", category: "하체", isOneArm: true, type: "weight" },
   { id: "ex_76", name: "행잉 레그 레이즈", category: "복근", isOneArm: false, type: "bodyweight" },
+  { id: "ex_77", name: "행잉 닌자 키즈", category: "복근", isOneArm: false, type: "bodyweight" },
+  { id: "ex_78", name: "크런치", category: "복근", isOneArm: false, type: "bodyweight" },
+  { id: "ex_79", name: "케이블 크런치", category: "복근", isOneArm: false, type: "weight" },
+  { id: "ex_80", name: "플랭크", category: "복근", isOneArm: false, type: "bodyweight" },
+  { id: "ex_81", name: "시티드 니업", category: "복근", isOneArm: false, type: "bodyweight" },
+  { id: "custom_1789541276138", name: "윗몸 일으키기", category: "복근", isOneArm: false, type: "weight" },
+  { id: "ex_65", name: "바벨 컬", category: "이두", isOneArm: false, type: "weight" },
+  { id: "ex_66", name: "EZ바 컬", category: "이두", isOneArm: false, type: "weight" },
+  { id: "ex_67", name: "덤벨 컬", category: "이두", isOneArm: false, type: "weight" },
+  { id: "ex_68", name: "덤벨 해머 컬", category: "이두", isOneArm: false, type: "weight" },
+  { id: "ex_69", name: "인클라인 덤벨 컬", category: "이두", isOneArm: false, type: "weight" },
+  { id: "ex_70", name: "프리처 컬", category: "이두", isOneArm: false, type: "weight" },
+  { id: "custom_1789709053935", name: "케이블 컬", category: "이두", isOneArm: true, type: "weight" },
+  { id: "ex_71", name: "케이블 킥백", category: "삼두", isOneArm: true, type: "weight" },
+  { id: "ex_72", name: "케이블 푸쉬다운 (바)", category: "삼두", isOneArm: false, type: "weight" },
+  { id: "ex_73", name: "케이블 푸쉬다운 (로프)", category: "삼두", isOneArm: false, type: "weight" },
+  { id: "ex_74", name: "바벨 트라이셉스 익스텐션 (라잉)", category: "삼두", isOneArm: false, type: "weight" },
+  { id: "ex_75", name: "덤벨 오버헤드 익스텐션", category: "삼두", isOneArm: false, type: "weight" },
   { id: "ex_82", name: "천국의 계단 (스텝밀)", category: "유산소", isOneArm: false, type: "cardio" },
   { id: "ex_83", name: "런닝머신 (인클라인)", category: "유산소", isOneArm: false, type: "cardio" },
+  { id: "ex_84", name: "실내 자전거", category: "유산소", isOneArm: false, type: "cardio" },
+  { id: "ex_85", name: "로잉 머신", category: "유산소", isOneArm: false, type: "cardio" },
+  { id: "ex_86", name: "사이클 스피닝", category: "유산소", isOneArm: false, type: "cardio" },
+  { id: "custom_1789309302937", name: "[실외]러닝", category: "유산소", isOneArm: false, type: "cardio" },
 ];
 
 // 예전에 쓰던 '후면어깨' 분류는 '어깨'로 통합 (불러올 때 자동 변환)
 const normalizeCategory = (c: string) => (c === "후면어깨" ? "어깨" : c);
+
+// 이름·부위·유형·원암 여부가 전부 같은 종목이 겹쳐 있으면 하나만 남김
+const dedupeExercises = (list: ExerciseDef[]) => {
+  const seen = new Set<string>();
+  return list.filter((e) => {
+    const k = `${e.name}|${e.category}|${e.isOneArm}|${e.type}`;
+    if (seen.has(k)) return false;
+    seen.add(k);
+    return true;
+  });
+};
 
 const DAYS = ["월요일", "화요일", "수요일", "목요일", "금요일", "토요일", "일요일"];
 const CATEGORIES = ["전체", "가슴", "등", "어깨", "하체", "복근", "이두", "삼두", "유산소"];
@@ -239,7 +319,9 @@ export default function GymTracker() {
         const data = await res.json();
         if (data.exerciseDb && data.exerciseDb.length > 0) {
           setExerciseDb(
-            data.exerciseDb.map((e: ExerciseDef) => ({ ...e, category: normalizeCategory(e.category) }))
+            dedupeExercises(
+              data.exerciseDb.map((e: ExerciseDef) => ({ ...e, category: normalizeCategory(e.category) }))
+            )
           );
         }
         if (data.routines) setRoutines(data.routines.map(normalizeRoutine));
@@ -336,7 +418,6 @@ export default function GymTracker() {
         category: newExCategory,
         type: newExType,
         isOneArm: newExIsOneArm,
-        isCustom: true,
       };
       updatedDb = [...exerciseDb, created];
       setExerciseDb(updatedDb);
@@ -403,11 +484,10 @@ export default function GymTracker() {
     }));
   };
 
-  const addExerciseToScheduleDay = (day: string, exName: string) => {
-    const found = exerciseDb.find((e) => e.name === exName);
-    const exerciseToAdd = found
-      ? { name: found.name, category: found.category, isOneArm: found.isOneArm, type: found.type }
-      : { name: exName, category: "기타", isOneArm: false, type: "weight" as ExerciseType };
+  const addExerciseToScheduleDay = (day: string, exId: string) => {
+    const found = exerciseDb.find((e) => e.id === exId);
+    if (!found) return;
+    const exerciseToAdd = { name: found.name, category: found.category, isOneArm: found.isOneArm, type: found.type };
 
     setEditingSchedule((prev) => ({
       ...prev,
@@ -536,11 +616,10 @@ export default function GymTracker() {
     setActiveTab("log");
   };
 
-  const addExerciseToWorkout = (exName: string) => {
-    const found = exerciseDb.find((e) => e.name === exName);
-    const exerciseToAdd = found
-      ? { name: found.name, category: found.category, isOneArm: found.isOneArm, type: found.type }
-      : { name: exName, category: "기타", isOneArm: false, type: "weight" as ExerciseType };
+  const addExerciseToWorkout = (exId: string) => {
+    const found = exerciseDb.find((e) => e.id === exId);
+    if (!found) return;
+    const exerciseToAdd = { name: found.name, category: found.category, isOneArm: found.isOneArm, type: found.type };
 
     setCurrentWorkout((prev) => ({
       ...prev,
@@ -859,7 +938,7 @@ export default function GymTracker() {
                 -- [{selectedCategoryTab}] 운동 선택 ({filteredExercises.length}개) --
               </option>
               {filteredExercises.map((ex) => (
-                <option key={ex.id} value={ex.name}>
+                <option key={ex.id} value={ex.id}>
                   [{ex.category}] {getTagString(ex.name, ex.isOneArm, ex.category)} {cleanName(ex.name)}
                 </option>
               ))}
@@ -1088,7 +1167,7 @@ export default function GymTracker() {
                         >
                           <option value="">+ {day} 운동 종목 추가</option>
                           {exerciseDb.map((ex) => (
-                            <option key={ex.id} value={ex.name}>
+                            <option key={ex.id} value={ex.id}>
                               [{ex.category}] {getTagString(ex.name, ex.isOneArm, ex.category)} {cleanName(ex.name)}
                             </option>
                           ))}
