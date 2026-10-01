@@ -15,5 +15,8 @@ export const gymData = pgTable("gym_data", {
   exerciseDb: jsonb("exercise_db").notNull().default([]),
   routines: jsonb("routines").notNull().default([]),
   logs: jsonb("logs").notNull().default([]),
+  // 작성 중인(아직 저장 안 한) 운동 임시저장. { date, title, exercises } 형태.
+  // date가 오늘이 아니면 불러올 때 무시 — 자정이 지나면 자동으로 초기화되는 효과.
+  draft: jsonb("draft"),
   updatedAt: timestamp("updated_at").defaultNow(),
 });

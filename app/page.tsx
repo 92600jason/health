@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import { UserButton } from "@clerk/nextjs";
+import React, { useState, useEffect, useRef } from "react";
+import { UserButton, useAuth } from "@clerk/nextjs";
 
 export type ExerciseType = "weight" | "bodyweight" | "cardio";
 
@@ -19,36 +19,116 @@ const INITIAL_EXERCISE_DATABASE: ExerciseDef[] = [
   { id: "ex_1", name: "바벨 벤치프레스", category: "가슴", isOneArm: false, type: "weight" },
   { id: "ex_2", name: "덤벨 벤치프레스", category: "가슴", isOneArm: false, type: "weight" },
   { id: "ex_3", name: "스미스 머신 벤치프레스", category: "가슴", isOneArm: false, type: "weight" },
+  { id: "ex_4", name: "체스트 프레스 머신", category: "가슴", isOneArm: false, type: "weight" },
+  { id: "ex_5", name: "바벨 인클라인 벤치프레스", category: "가슴", isOneArm: false, type: "weight" },
+  { id: "ex_6", name: "덤벨 인클라인 벤치프레스", category: "가슴", isOneArm: false, type: "weight" },
+  { id: "ex_7", name: "인클라인 체스트 프레스 머신", category: "가슴", isOneArm: false, type: "weight" },
+  { id: "ex_8", name: "덤벨 디클라인 벤치프레스", category: "가슴", isOneArm: false, type: "weight" },
   { id: "ex_9", name: "덤벨 체스트 플라이", category: "가슴", isOneArm: false, type: "weight" },
+  { id: "ex_10", name: "펙덱 플라이 머신", category: "가슴", isOneArm: false, type: "weight" },
   { id: "ex_11", name: "케이블 체스트 플라이", category: "가슴", isOneArm: false, type: "weight" },
+  { id: "ex_12", name: "케이블 하이투로우 플라이", category: "가슴", isOneArm: false, type: "weight" },
+  { id: "ex_13", name: "케이블 로우투하이 플라이", category: "가슴", isOneArm: false, type: "weight" },
+  { id: "ex_14", name: "딥스 (가슴 자극)", category: "가슴", isOneArm: false, type: "bodyweight" },
   { id: "ex_15", name: "푸쉬업 (팔굽혀펴기)", category: "가슴", isOneArm: false, type: "bodyweight" },
   { id: "ex_16", name: "풀업 (맨몸 턱걸이)", category: "등", isOneArm: false, type: "bodyweight" },
+  { id: "ex_17", name: "어시스트 풀업 머신", category: "등", isOneArm: false, type: "weight" },
   { id: "ex_18", name: "렛풀다운 (오버그립)", category: "등", isOneArm: false, type: "weight" },
+  { id: "ex_19", name: "렛풀다운 (언더그립)", category: "등", isOneArm: false, type: "weight" },
+  { id: "ex_20", name: "클로즈그립 렛풀다운", category: "등", isOneArm: false, type: "weight" },
+  { id: "ex_21", name: "와이드그립 렛풀다운", category: "등", isOneArm: false, type: "weight" },
   { id: "ex_22", name: "컨벤셔널 데드리프트", category: "등", isOneArm: false, type: "weight" },
+  { id: "ex_23", name: "루마니안 데드리프트", category: "등", isOneArm: false, type: "weight" },
+  { id: "ex_24", name: "렉풀 (Rack Pull)", category: "등", isOneArm: false, type: "weight" },
   { id: "ex_25", name: "바벨로우", category: "등", isOneArm: false, type: "weight" },
+  { id: "ex_26", name: "펜들레이 로우", category: "등", isOneArm: false, type: "weight" },
+  { id: "ex_27", name: "덤벨로우", category: "등", isOneArm: false, type: "weight" },
   { id: "ex_28", name: "원암 덤벨로우", category: "등", isOneArm: true, type: "weight" },
-  { id: "ex_29", name: "시티드 케이블로우", category: "등", isOneArm: false, type: "weight" },
-  { id: "ex_34", name: "바벨 오버헤드 프레스 (OHP)", category: "어깨", isOneArm: false, type: "weight" },
-  { id: "ex_36", name: "덤벨 숄더 프레스", category: "어깨", isOneArm: false, type: "weight" },
-  { id: "ex_39", name: "덤벨 사이드 레이터럴 레이즈", category: "어깨", isOneArm: false, type: "weight" },
-  { id: "ex_45", name: "케이블 페이스풀", category: "어깨", isOneArm: false, type: "weight" },
+  { id: "ex_29", name: "시티드 케이블로우 (V바)", category: "등", isOneArm: false, type: "weight" },
+  { id: "ex_30", name: "시티드 케이블로우 (와이드바)", category: "등", isOneArm: false, type: "weight" },
+  { id: "ex_31", name: "T바 로우", category: "등", isOneArm: false, type: "weight" },
+  { id: "ex_32", name: "암 풀다운 (케이블)", category: "등", isOneArm: false, type: "weight" },
+  { id: "ex_33", name: "백 익스텐션", category: "등", isOneArm: false, type: "bodyweight" },
+  { id: "custom_1788873670783", name: "케이블 렛풀다운", category: "등", isOneArm: false, type: "weight" },
+  { id: "custom_1788874214967", name: "[원암] 케이블 로우", category: "등", isOneArm: true, type: "weight" },
+  { id: "custom_1789707311529", name: "시티드 로우", category: "등", isOneArm: true, type: "weight" },
+  { id: "ex_34", name: "[전면] 바벨 오버헤드 프레스 (OHP)", category: "어깨", isOneArm: false, type: "weight" },
+  { id: "ex_35", name: "[전면] 스미스 머신 숄더 프레스", category: "어깨", isOneArm: false, type: "weight" },
+  { id: "ex_36", name: "[전면] 덤벨 숄더 프레스", category: "어깨", isOneArm: false, type: "weight" },
+  { id: "ex_37", name: "[전면] 아놀드 프레스", category: "어깨", isOneArm: false, type: "weight" },
+  { id: "ex_38", name: "[전면] 숄더 프레스 머신", category: "어깨", isOneArm: false, type: "weight" },
+  { id: "ex_39", name: "[측면] 덤벨 사이드 레이터럴 레이즈", category: "어깨", isOneArm: false, type: "weight" },
+  { id: "ex_40", name: "[측면] 케이블 사이드 레이터럴 레이즈", category: "어깨", isOneArm: false, type: "weight" },
+  { id: "ex_41", name: "[측면] 머신 사이드 레이터럴 레이즈", category: "어깨", isOneArm: false, type: "weight" },
+  { id: "ex_42", name: "[측면] 업라이트 로우", category: "어깨", isOneArm: false, type: "weight" },
+  { id: "ex_43", name: "[후면] 덤벨 리버스 플라이", category: "어깨", isOneArm: false, type: "weight" },
+  { id: "ex_44", name: "[후면] 리버스 펙덱 플라이 머신", category: "어깨", isOneArm: false, type: "weight" },
+  { id: "ex_45", name: "[후면] 케이블 페이스풀", category: "어깨", isOneArm: false, type: "weight" },
+  { id: "ex_46", name: "[후면] 벤트오버 레이터럴 레이즈", category: "어깨", isOneArm: false, type: "weight" },
+  { id: "custom_1788788186084", name: "[측면] 스미스 숄더 프레스", category: "어깨", isOneArm: false, type: "weight" },
+  { id: "custom_1789998528510", name: "케이블 후면  리버스 플라이", category: "어깨", isOneArm: true, type: "weight" },
   { id: "ex_47", name: "바벨 백스쿼트", category: "하체", isOneArm: false, type: "weight" },
+  { id: "ex_48", name: "바벨 프론트 스쿼트", category: "하체", isOneArm: false, type: "weight" },
+  { id: "ex_49", name: "스미스 머신 스쿼트", category: "하체", isOneArm: false, type: "weight" },
+  { id: "ex_50", name: "핵 스쿼트 머신", category: "하체", isOneArm: false, type: "weight" },
+  { id: "ex_51", name: "덤벨 레귤러 스쿼트", category: "하체", isOneArm: false, type: "weight" },
+  { id: "ex_52", name: "덤벨 와이드 스쿼트", category: "하체", isOneArm: false, type: "weight" },
+  { id: "ex_53", name: "덤벨 고블렛 스쿼트", category: "하체", isOneArm: false, type: "weight" },
   { id: "ex_54", name: "레그 프레스", category: "하체", isOneArm: false, type: "weight" },
+  { id: "ex_55", name: "파워 레그 프레스", category: "하체", isOneArm: false, type: "weight" },
   { id: "ex_56", name: "레그 익스텐션", category: "하체", isOneArm: false, type: "weight" },
+  { id: "ex_57", name: "라잉 레그 컬", category: "하체", isOneArm: false, type: "weight" },
+  { id: "ex_58", name: "시티드 레그 컬", category: "하체", isOneArm: false, type: "weight" },
+  { id: "ex_59", name: "스티프 레그 데드리프트", category: "하체", isOneArm: false, type: "weight" },
   { id: "ex_60", name: "덤벨 런지", category: "하체", isOneArm: true, type: "weight" },
   { id: "ex_61", name: "불가리안 스플릿 스쿼트", category: "하체", isOneArm: true, type: "weight" },
-  { id: "ex_65", name: "바벨 컬", category: "이두", isOneArm: false, type: "weight" },
-  { id: "ex_72", name: "케이블 푸쉬다운", category: "삼두", isOneArm: false, type: "weight" },
+  { id: "ex_62", name: "바벨 힙 쓰러스터", category: "하체", isOneArm: false, type: "weight" },
+  { id: "ex_63", name: "이너싸이 (아웃타이/이너타이)", category: "하체", isOneArm: false, type: "weight" },
+  { id: "ex_64", name: "카프 레이즈", category: "하체", isOneArm: false, type: "weight" },
+  { id: "custom_1788324594246", name: "레그 익스텐션", category: "하체", isOneArm: true, type: "weight" },
   { id: "ex_76", name: "행잉 레그 레이즈", category: "복근", isOneArm: false, type: "bodyweight" },
+  { id: "ex_77", name: "행잉 닌자 키즈", category: "복근", isOneArm: false, type: "bodyweight" },
+  { id: "ex_78", name: "크런치", category: "복근", isOneArm: false, type: "bodyweight" },
+  { id: "ex_79", name: "케이블 크런치", category: "복근", isOneArm: false, type: "weight" },
+  { id: "ex_80", name: "플랭크", category: "복근", isOneArm: false, type: "bodyweight" },
+  { id: "ex_81", name: "시티드 니업", category: "복근", isOneArm: false, type: "bodyweight" },
+  { id: "custom_1789541276138", name: "윗몸 일으키기", category: "복근", isOneArm: false, type: "weight" },
+  { id: "ex_65", name: "바벨 컬", category: "이두", isOneArm: false, type: "weight" },
+  { id: "ex_66", name: "EZ바 컬", category: "이두", isOneArm: false, type: "weight" },
+  { id: "ex_67", name: "덤벨 컬", category: "이두", isOneArm: false, type: "weight" },
+  { id: "ex_68", name: "덤벨 해머 컬", category: "이두", isOneArm: false, type: "weight" },
+  { id: "ex_69", name: "인클라인 덤벨 컬", category: "이두", isOneArm: false, type: "weight" },
+  { id: "ex_70", name: "프리처 컬", category: "이두", isOneArm: false, type: "weight" },
+  { id: "custom_1789709053935", name: "케이블 컬", category: "이두", isOneArm: true, type: "weight" },
+  { id: "ex_71", name: "케이블 킥백", category: "삼두", isOneArm: true, type: "weight" },
+  { id: "ex_72", name: "케이블 푸쉬다운 (바)", category: "삼두", isOneArm: false, type: "weight" },
+  { id: "ex_73", name: "케이블 푸쉬다운 (로프)", category: "삼두", isOneArm: false, type: "weight" },
+  { id: "ex_74", name: "바벨 트라이셉스 익스텐션 (라잉)", category: "삼두", isOneArm: false, type: "weight" },
+  { id: "ex_75", name: "덤벨 오버헤드 익스텐션", category: "삼두", isOneArm: false, type: "weight" },
   { id: "ex_82", name: "천국의 계단 (스텝밀)", category: "유산소", isOneArm: false, type: "cardio" },
   { id: "ex_83", name: "런닝머신 (인클라인)", category: "유산소", isOneArm: false, type: "cardio" },
+  { id: "ex_84", name: "실내 자전거", category: "유산소", isOneArm: false, type: "cardio" },
+  { id: "ex_85", name: "로잉 머신", category: "유산소", isOneArm: false, type: "cardio" },
+  { id: "ex_86", name: "사이클 스피닝", category: "유산소", isOneArm: false, type: "cardio" },
+  { id: "custom_1789309302937", name: "[실외]러닝", category: "유산소", isOneArm: false, type: "cardio" },
 ];
 
 // 예전에 쓰던 '후면어깨' 분류는 '어깨'로 통합 (불러올 때 자동 변환)
 const normalizeCategory = (c: string) => (c === "후면어깨" ? "어깨" : c);
 
+// 이름·부위·유형·원암 여부가 전부 같은 종목이 겹쳐 있으면 하나만 남김
+const dedupeExercises = (list: ExerciseDef[]) => {
+  const seen = new Set<string>();
+  return list.filter((e) => {
+    const k = `${e.name}|${e.category}|${e.isOneArm}|${e.type}`;
+    if (seen.has(k)) return false;
+    seen.add(k);
+    return true;
+  });
+};
+
 const DAYS = ["월요일", "화요일", "수요일", "목요일", "금요일", "토요일", "일요일"];
-const CATEGORIES = ["전체", "가슴", "등", "어깨", "하체", "복근", "이두", "삼두", "유산소", "원암/원레그 🦾"];
+const CATEGORIES = ["전체", "가슴", "등", "어깨", "하체", "복근", "이두", "삼두", "유산소"];
 
 interface SetItem {
   setNumber: number;
@@ -107,6 +187,16 @@ const getTodayString = () => {
   const month = String(now.getMonth() + 1).padStart(2, "0");
   const day = String(now.getDate()).padStart(2, "0");
   return `${year}-${month}-${day}`;
+};
+
+// ─── 그 날짜에 보여줄 운동: 저장된 기록이 있으면 그걸, 없으면 빈 운동 ───
+type Workout = { title: string; exercises: ExerciseItem[] };
+type Draft = { date: string; title: string; exercises: ExerciseItem[] };
+
+const workoutFor = (date: string, logs: WorkoutLog[]): Workout => {
+  const log = logs.find((l) => l.date === date);
+  if (log) return { title: log.title, exercises: JSON.parse(JSON.stringify(log.exercises)) };
+  return { title: "오늘의 운동", exercises: [] };
 };
 
 const renderTags = (ex: { name: string; isOneArm: boolean; category: string }) => {
@@ -184,76 +274,155 @@ export default function GymTracker() {
     }, {} as Record<string, DaySchedule>)
   );
 
+  // 서버에서 데이터를 정상적으로 불러온 경우에만 저장 허용 (실패 상태에서 저장하면 기존 기록을 덮어쓸 수 있음)
+  const loadedOkRef = useRef(false);
+  const hasInitializedRef = useRef(false);
+  const [loadError, setLoadError] = useState(false);
+  const [reloadKey, setReloadKey] = useState(0);
+
+  // 로그인 세션(Clerk)이 준비된 뒤에만 서버에 요청하고, 토큰이 만료돼 있으면 새 토큰으로 재시도
+  const { isLoaded: authLoaded, isSignedIn, getToken } = useAuth();
+  const getTokenRef = useRef(getToken);
+  getTokenRef.current = getToken;
+  const selectedDateRef = useRef(selectedDate);
+  selectedDateRef.current = selectedDate;
+
+  const apiFetch = async (url: string, init: RequestInit = {}): Promise<Response> => {
+    let res: Response | null = null;
+    for (let attempt = 0; attempt < 3; attempt++) {
+      let token: string | null = null;
+      try {
+        token = await getTokenRef.current({ skipCache: attempt > 0 });
+      } catch {}
+      res = await fetch(url, {
+        ...init,
+        headers: {
+          ...(init.headers as Record<string, string> | undefined),
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+      });
+      if (res.status !== 401 && res.status !== 404) return res;
+      await new Promise((r) => setTimeout(r, 500 * (attempt + 1)));
+    }
+    return res as Response;
+  };
+
   // ─── 1. 서버(Neon DB)에서 데이터 불러오기 ───
   useEffect(() => {
+    if (!authLoaded) return;
     const loadData = async () => {
+      const todayStr = getTodayString();
+      let logs: WorkoutLog[] = [];
+      let draft: Draft | null = null;
+      let ok = false;
       try {
-        const res = await fetch("/api/gym-data");
-        if (res.status === 401) {
-          console.warn("로그인이 필요합니다.");
-          return;
-        }
-        if (!res.ok) throw new Error("서버 응답 오류");
+        if (!isSignedIn) throw new Error("로그인 세션이 없습니다");
+        const res = await apiFetch("/api/gym-data");
+        if (!res.ok) throw new Error(`서버 응답 오류 (${res.status})`);
 
         const data = await res.json();
         if (data.exerciseDb && data.exerciseDb.length > 0) {
           setExerciseDb(
-            data.exerciseDb.map((e: ExerciseDef) => ({ ...e, category: normalizeCategory(e.category) }))
+            dedupeExercises(
+              data.exerciseDb.map((e: ExerciseDef) => ({ ...e, category: normalizeCategory(e.category) }))
+            )
           );
         }
         if (data.routines) setRoutines(data.routines.map(normalizeRoutine));
         if (data.logs) {
-          const logs: WorkoutLog[] = data.logs.map(normalizeLog);
+          logs = data.logs.map(normalizeLog);
           setWorkoutLogs(logs);
-          const todayStr = getTodayString();
-          const existingLog = logs.find((l) => l.date === todayStr);
-          if (existingLog) {
-            setCurrentWorkout({
-              title: existingLog.title,
-              exercises: JSON.parse(JSON.stringify(existingLog.exercises)),
-            });
-          }
         }
+        if (data.draft && data.draft.date === todayStr) draft = data.draft;
+        ok = true;
       } catch (error) {
         console.error("데이터 로드 실패:", error);
-        alert("서버에서 데이터를 불러오지 못했습니다. 새로고침 해주세요.");
       } finally {
+        loadedOkRef.current = ok;
+        setLoadError(!ok);
+        // 최초 로드 때만 화면을 채움 ("다시 불러오기"로 재시도할 땐 작성 중인 내용을 덮지 않음)
+        if (!hasInitializedRef.current) {
+          hasInitializedRef.current = true;
+          if (draft) {
+            setCurrentWorkout({
+              title: draft.title,
+              exercises: draft.exercises.map((e) => ({ ...e, category: normalizeCategory(e.category) })),
+            });
+          } else {
+            setCurrentWorkout(workoutFor(selectedDateRef.current, logs));
+          }
+        }
         setIsLoaded(true);
       }
     };
     loadData();
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [authLoaded, isSignedIn, reloadKey]);
 
-  // ─── 2. 데이터 변경 시 서버(Neon DB)로 저장 ───
-  const syncToServer = (updatedData: {
-    exerciseDb?: ExerciseDef[];
-    routines?: WeeklyRoutine[];
-    logs?: WorkoutLog[];
-  }) => {
+  // ─── 1-2. 작성 중인 '오늘' 운동을 서버에 자동 임시저장 (약간의 지연 후, DB draft) ───
+  const draftTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(() => {
     if (!isLoaded) return;
-    fetch("/api/gym-data", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(updatedData),
-    }).catch((error) => {
+    const today = getTodayString();
+    if (selectedDate !== today) return;
+
+    if (draftTimerRef.current) clearTimeout(draftTimerRef.current);
+    draftTimerRef.current = setTimeout(() => {
+      const log = workoutLogs.find((l) => l.date === today);
+      const baseline = log
+        ? { title: log.title, exercises: log.exercises }
+        : { title: "오늘의 운동", exercises: [] };
+      const isEmpty = JSON.stringify(currentWorkout) === JSON.stringify(baseline);
+      syncToServer(
+        { draft: isEmpty ? null : { date: today, title: currentWorkout.title, exercises: currentWorkout.exercises } },
+        { silent: true }
+      );
+    }, 800);
+
+    return () => {
+      if (draftTimerRef.current) clearTimeout(draftTimerRef.current);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentWorkout, selectedDate, isLoaded]);
+
+  // ─── 2. 데이터 변경 시 서버(Neon DB)로 저장 (성공 여부를 true/false로 반환) ───
+  const syncToServer = async (
+    updatedData: {
+      exerciseDb?: ExerciseDef[];
+      routines?: WeeklyRoutine[];
+      logs?: WorkoutLog[];
+      draft?: Draft | null;
+    },
+    opts: { silent?: boolean } = {}
+  ): Promise<boolean> => {
+    if (!isLoaded) return false;
+    if (!loadedOkRef.current) {
+      if (!opts.silent) {
+        alert("서버 데이터를 불러오지 못한 상태라 저장할 수 없어요.\n위쪽 빨간 안내의 [다시 불러오기]를 눌러주세요.");
+      }
+      return false;
+    }
+    try {
+      const res = await apiFetch("/api/gym-data", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(updatedData),
+      });
+      if (!res.ok) throw new Error(`서버 응답 오류 (${res.status})`);
+      return true;
+    } catch (error) {
       console.error("서버 저장 실패:", error);
-      alert("서버 저장에 실패했습니다. 네트워크 연결을 확인하고 다시 시도해주세요.");
-    });
+      if (!opts.silent) {
+        alert("서버 저장에 실패했어요! 로그인 상태나 네트워크를 확인하고 다시 저장해주세요.\n(새로고침하면 방금 변경한 내용이 사라질 수 있어요)");
+      }
+      return false;
+    }
   };
 
   const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newDate = e.target.value;
     setSelectedDate(newDate);
-
-    const existingLog = workoutLogs.find((l) => l.date === newDate);
-    if (existingLog) {
-      setCurrentWorkout({
-        title: existingLog.title,
-        exercises: JSON.parse(JSON.stringify(existingLog.exercises)),
-      });
-    } else {
-      setCurrentWorkout({ title: "오늘의 운동", exercises: [] });
-    }
+    setCurrentWorkout(workoutFor(newDate, workoutLogs));
   };
 
   const handleResetWorkout = () => {
@@ -284,7 +453,6 @@ export default function GymTracker() {
         category: newExCategory,
         type: newExType,
         isOneArm: newExIsOneArm,
-        isCustom: true,
       };
       updatedDb = [...exerciseDb, created];
       setExerciseDb(updatedDb);
@@ -351,11 +519,10 @@ export default function GymTracker() {
     }));
   };
 
-  const addExerciseToScheduleDay = (day: string, exName: string) => {
-    const found = exerciseDb.find((e) => e.name === exName);
-    const exerciseToAdd = found
-      ? { name: found.name, category: found.category, isOneArm: found.isOneArm, type: found.type }
-      : { name: exName, category: "기타", isOneArm: false, type: "weight" as ExerciseType };
+  const addExerciseToScheduleDay = (day: string, exId: string) => {
+    const found = exerciseDb.find((e) => e.id === exId);
+    if (!found) return;
+    const exerciseToAdd = { name: found.name, category: found.category, isOneArm: found.isOneArm, type: found.type };
 
     setEditingSchedule((prev) => ({
       ...prev,
@@ -474,13 +641,7 @@ export default function GymTracker() {
       sets: ex.sets.map((s) => ({ ...s, completed: false })),
     }));
 
-    const todayLog = workoutLogs.find((l) => l.date === today);
-    const base =
-      selectedDate === today
-        ? currentWorkout
-        : todayLog
-        ? { title: todayLog.title, exercises: JSON.parse(JSON.stringify(todayLog.exercises)) }
-        : { title: "오늘의 운동", exercises: [] };
+    const base = selectedDate === today ? currentWorkout : workoutFor(today, workoutLogs);
 
     setSelectedDate(today);
     setCurrentWorkout({
@@ -490,11 +651,10 @@ export default function GymTracker() {
     setActiveTab("log");
   };
 
-  const addExerciseToWorkout = (exName: string) => {
-    const found = exerciseDb.find((e) => e.name === exName);
-    const exerciseToAdd = found
-      ? { name: found.name, category: found.category, isOneArm: found.isOneArm, type: found.type }
-      : { name: exName, category: "기타", isOneArm: false, type: "weight" as ExerciseType };
+  const addExerciseToWorkout = (exId: string) => {
+    const found = exerciseDb.find((e) => e.id === exId);
+    if (!found) return;
+    const exerciseToAdd = { name: found.name, category: found.category, isOneArm: found.isOneArm, type: found.type };
 
     setCurrentWorkout((prev) => ({
       ...prev,
@@ -584,7 +744,7 @@ export default function GymTracker() {
     });
   };
 
-  const saveWorkoutLog = () => {
+  const saveWorkoutLog = async () => {
     if (currentWorkout.exercises.length === 0) {
       alert("기록할 운동 종목이 없습니다.");
       return;
@@ -627,9 +787,13 @@ export default function GymTracker() {
       return [newLogItem, ...workoutLogs].sort((a, b) => (a.date < b.date ? 1 : -1));
     })();
 
-    setWorkoutLogs(updatedLogs);
-    syncToServer({ logs: updatedLogs });
+    const ok = await syncToServer({
+      logs: updatedLogs,
+      ...(selectedDate === getTodayString() ? { draft: null } : {}),
+    });
+    if (!ok) return;
 
+    setWorkoutLogs(updatedLogs);
     alert(`${selectedDate} 기록이 서버에 안전하게 저장되었습니다!\n(※ 완료 체크된 세트만 반영되었습니다)`);
   };
 
@@ -641,7 +805,6 @@ export default function GymTracker() {
   const filteredExercises = exerciseDb
     .filter((ex) => {
       if (selectedCategoryTab === "전체") return true;
-      if (selectedCategoryTab === "원암/원레그 🦾") return ex.isOneArm;
       return ex.category === selectedCategoryTab;
     })
     .sort((a, b) => categoryOrder(a.category) - categoryOrder(b.category));
@@ -722,6 +885,20 @@ export default function GymTracker() {
           className="bg-slate-900 border border-slate-700 text-slate-200 text-sm rounded px-3 py-1.5"
         />
       </header>
+
+      {loadError && (
+        <div className="mb-4 p-3 rounded-lg border border-red-700 bg-red-950/60 text-xs text-red-200 flex items-center justify-between gap-3">
+          <span>
+            서버에서 데이터를 불러오지 못했어요. 기록이 덮어써지지 않도록 저장은 막아두었어요.
+          </span>
+          <button
+            onClick={() => (isSignedIn ? setReloadKey((k) => k + 1) : window.location.reload())}
+            className="shrink-0 bg-red-700 hover:bg-red-600 text-white px-2.5 py-1 rounded font-bold"
+          >
+            다시 불러오기
+          </button>
+        </div>
+      )}
 
       <nav className="flex bg-slate-900 rounded-lg p-1 mb-6 border border-slate-800">
         <button
@@ -813,7 +990,7 @@ export default function GymTracker() {
                 -- [{selectedCategoryTab}] 운동 선택 ({filteredExercises.length}개) --
               </option>
               {filteredExercises.map((ex) => (
-                <option key={ex.id} value={ex.name}>
+                <option key={ex.id} value={ex.id}>
                   [{ex.category}] {getTagString(ex.name, ex.isOneArm, ex.category)} {cleanName(ex.name)}
                 </option>
               ))}
@@ -1042,7 +1219,7 @@ export default function GymTracker() {
                         >
                           <option value="">+ {day} 운동 종목 추가</option>
                           {exerciseDb.map((ex) => (
-                            <option key={ex.id} value={ex.name}>
+                            <option key={ex.id} value={ex.id}>
                               [{ex.category}] {getTagString(ex.name, ex.isOneArm, ex.category)} {cleanName(ex.name)}
                             </option>
                           ))}
@@ -1189,6 +1366,7 @@ export default function GymTracker() {
                   <button
                     onClick={() => {
                       setSelectedDate(viewingLogDate);
+                      setCurrentWorkout(workoutFor(viewingLogDate, workoutLogs));
                       setActiveTab("log");
                     }}
                     className="bg-blue-600 text-white text-xs px-2.5 py-1 rounded font-bold"
@@ -1285,7 +1463,7 @@ export default function GymTracker() {
                         onChange={(e) => setNewExCategory(e.target.value)}
                         className="w-full bg-slate-900 border border-slate-700 rounded p-2 text-xs text-slate-200"
                       >
-                        {CATEGORIES.filter((c) => c !== "전체" && c !== "원암/원레그 🦾").map((cat) => (
+                        {CATEGORIES.filter((c) => c !== "전체").map((cat) => (
                           <option key={cat} value={cat}>
                             {cat}
                           </option>
